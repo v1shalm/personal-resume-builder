@@ -1,0 +1,184 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { ResumePreview } from "../preview/ResumePreview";
+import { FontLoader } from "../preview/FontLoader";
+import { useResumeStore } from "@/lib/store";
+import { Minus, Plus, Maximize2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { spring } from "@/lib/motion";
+
+// A4 at 96 dpi — kept in sync with ResumePreview.
+const PAGE_W = 794;
+const PAGE_H = 1123;
+
+export function PreviewPane() {
+  const resume = useResumeStore((s) => s.resume);
+  const [zoom, setZoom] = useState(0.82);
+  const [fitMode, setFitMode] = useState(true);
+
+  useEffect(() => {
+    if (!fitMode) return;
+    const fit = () => {
+      const container = document.getElementById("preview-scroll");
+      if (!container) return;
+      const availableW = container.clientWidth - 96;
+      const availableH = container.clientHeight - 96;
+      const scale = Math.min(availableW / PAGE_W, availableH / PAGE_H, 1);
+      setZoom(Math.max(0.4, scale));
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [fitMode]);
+
+  const zoomPct = Math.round(zoom * 100);
+
+  return (
+    <div
+      className="relative flex min-w-0 flex-col overflow-hidden"
+      style={{ background: "var(--canvas-bg)" }}
+    >
+      <FontLoader
+        titleFontId={resume.style.titleFontId}
+        bodyFontId={resume.style.bodyFontId}
+      />
+
+      <div
+        className="pointer-events-none absolute inset-0 bg-dot-grid bg-grid-sm opacity-60"
+        aria-hidden
+        style={{
+          maskImage:
+            "radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 90%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 80% 70% at 50% 50%, black 30%, transparent 90%)",
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-0"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 60% at 50% 40%, transparent 40%, var(--canvas-vignette) 100%)",
+        }}
+      />
+
+      <div id="preview-scroll" className="relative z-10 flex-1 overflow-auto">
+        <div className="flex min-h-full items-start justify-center p-12">
+          <motion.div
+            layout
+            transition={spring.soft}
+            className="origin-top shadow-paper-t"
+            style={{ transform: `scale(${zoom})` }}
+          >
+            <ResumePreview resume={resume} />
+          </motion.div>
+        </div>
+      </div>
+
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 rule-fade-v"
+        aria-hidden
+      />
+
+      {/* Floating zoom toolbar with primary-CTA-level depth (black/gray) */}
+      <motion.div
+        role="toolbar"
+        aria-label="Preview zoom"
+        initial={{ opacity: 0, y: 12, filter: "blur(6px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        transition={{ ...spring.soft, delay: 0.1 }}
+        className={cn(
+          "absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1 p-1.5 backdrop-blur-md",
+          "rounded-full border border-ink-border bg-overlay",
+          "shadow-[inset_0_1px_0_var(--shadow-highlight),0_2px_4px_var(--shadow-drop-close),0_12px_28px_-8px_var(--shadow-drop-far)]",
+        )}
+      >
+        <ToolbarIconButton
+          label="Zoom out"
+          disabled={zoom <= 0.4}
+          onClick={() => {
+            setFitMode(false);
+            setZoom((z) => Math.max(0.4, z - 0.1));
+          }}
+        >
+          <Minus className="h-3.5 w-3.5" aria-hidden />
+        </ToolbarIconButton>
+
+        <div className="relative flex h-8 min-w-[50px] items-center justify-center overflow-hidden px-1.5">
+          <AnimatePresence mode="popLayout" initial={false}>
+            <motion.span
+              key={zoomPct}
+              initial={{ y: 10, opacity: 0, filter: "blur(4px)" }}
+              animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+              exit={{ y: -10, opacity: 0, filter: "blur(4px)" }}
+              transition={spring.snap}
+              className="text-[12px] font-semibold tabular-nums text-ink-text"
+            >
+              {zoomPct}%
+            </motion.span>
+          </AnimatePresence>
+        </div>
+
+        <ToolbarIconButton
+          label="Zoom in"
+          disabled={zoom >= 1.5}
+          onClick={() => {
+            setFitMode(false);
+            setZoom((z) => Math.min(1.5, z + 0.1));
+          }}
+        >
+          <Plus className="h-3.5 w-3.5" aria-hidden />
+        </ToolbarIconButton>
+
+        <div className="mx-0.5 h-4 w-px bg-ink-border" aria-hidden />
+
+        <motion.button
+          onClick={() => setFitMode(true)}
+          whileTap={{ scale: 0.96, y: 0.5 }}
+          transition={spring.press}
+          aria-pressed={fitMode}
+          aria-label="Fit to window"
+          className={cn(
+            "flex h-8 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-semibold transition-colors duration-150",
+            fitMode
+              ? [
+                  "text-ink-text bg-card",
+                  "shadow-[inset_0_1px_0_var(--shadow-highlight),inset_0_-1px_0_var(--shadow-edge-dark),0_0_0_1px_var(--ink-border),0_1px_2px_var(--shadow-drop-close)]",
+                ].join(" ")
+              : "text-ink-muted hover:bg-ink-surfaceHi hover:text-ink-text",
+          )}
+        >
+          <Maximize2 className="h-3 w-3" aria-hidden />
+          Fit
+        </motion.button>
+      </motion.div>
+    </div>
+  );
+}
+
+function ToolbarIconButton({
+  label,
+  onClick,
+  disabled,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <motion.button
+      onClick={onClick}
+      disabled={disabled}
+      whileTap={disabled ? undefined : { scale: 0.9 }}
+      transition={spring.press}
+      aria-label={label}
+      className="flex h-8 w-8 items-center justify-center rounded-full text-ink-muted transition-colors duration-150 hover:bg-ink-surfaceHi hover:text-ink-text disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-ink-muted"
+    >
+      {children}
+    </motion.button>
+  );
+}
