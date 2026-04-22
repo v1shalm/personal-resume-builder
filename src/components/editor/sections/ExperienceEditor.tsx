@@ -30,7 +30,7 @@ export function ExperienceEditor() {
       {items.length === 0 ? (
         <EmptyState
           label="No roles yet."
-          hint="Add a role to populate the Experience section."
+          hint="Add a role to start building out your experience."
         />
       ) : (
         <SortableList
@@ -45,16 +45,21 @@ export function ExperienceEditor() {
                   className="h-8 flex-1 border-transparent bg-transparent text-[13.5px] font-semibold shadow-none hover:border-ink-border focus:shadow-none"
                   value={exp.company}
                   onChange={(e) => updateExperience(exp.id, { company: e.target.value })}
-                  placeholder="Company"
+                  placeholder="e.g. Pineapple Design Studio"
                 />
                 <button
                   type="button"
                   onClick={() => {
-                    if (confirm(`Remove ${exp.company || "this role"}?`)) {
+                    const label = exp.company || exp.role || "this role";
+                    if (
+                      confirm(
+                        `Delete ${label}?\n\nAll of its bullets will be removed too. Can't be undone.`,
+                      )
+                    ) {
                       removeExperience(exp.id);
                     }
                   }}
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-surface hover:text-ink-danger"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                   aria-label={`Remove ${exp.company || "role"}`}
                 >
                   <Trash2 className="h-3.5 w-3.5" aria-hidden />
@@ -66,7 +71,7 @@ export function ExperienceEditor() {
                   <Input
                     value={exp.role}
                     onChange={(e) => updateExperience(exp.id, { role: e.target.value })}
-                    placeholder="Product Designer"
+                    placeholder="e.g. Sr. Associate UI Designer"
                   />
                 </Field>
 
@@ -92,7 +97,11 @@ export function ExperienceEditor() {
                     <span className="text-[11.5px] font-medium uppercase tracking-[0.08em] text-ink-muted">
                       Bullets
                     </span>
-                    <Button variant="ghost" size="sm" onClick={() => addBullet(exp.id)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => addBullet(exp.id)}
+                    >
                       <Plus className="h-3.5 w-3.5" aria-hidden />
                       Bullet
                     </Button>
@@ -101,22 +110,22 @@ export function ExperienceEditor() {
                     items={exp.bullets}
                     onReorder={(from, to) => reorderBullets(exp.id, from, to)}
                     renderItem={(b, { dragAttrs, dragListeners }) => (
-                      <div className="group/bullet flex items-start gap-2 rounded-lg border border-ink-border bg-ink-bgDeep p-2 shadow-[inset_0_1px_0_var(--shadow-highlight)]">
+                      <div className="group/bullet flex items-start gap-2 rounded-lg border border-ink-border bg-input p-2 shadow-[inset_0_1px_0_var(--shadow-highlight)]">
                         <div className="pt-2">
                           <DragHandle dragAttrs={dragAttrs} dragListeners={dragListeners} />
                         </div>
                         <AutoTextarea
-                          aria-label="Bullet"
+                          aria-label="Bullet point"
                           minRows={2}
                           className="min-h-[52px] border-transparent bg-transparent shadow-none hover:border-ink-border focus:shadow-none"
                           value={b.text}
                           onChange={(e) => updateBullet(exp.id, b.id, e.target.value)}
-                          placeholder="What you did, and what happened because of it."
+                          placeholder="What you did, and the impact it had."
                         />
                         <button
                           type="button"
                           onClick={() => removeBullet(exp.id, b.id)}
-                          className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-bg hover:text-ink-danger"
+                          className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                           aria-label="Remove bullet"
                         >
                           <Trash2 className="h-3.5 w-3.5" aria-hidden />

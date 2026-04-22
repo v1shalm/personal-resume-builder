@@ -153,6 +153,7 @@ export function ResumeDocument({
   const titleFamily = "Helvetica";
   const bodyFamily = "Helvetica";
   const accent = style.accentColor;
+  const subAccent = style.subAccentColor;
 
   const hasItems = (id: SectionKind) => {
     if (id === "experience") return resume.experience.length > 0;
@@ -197,12 +198,26 @@ export function ResumeDocument({
               {header.name}
             </Text>
             {header.title ? (
-              <Text style={{ ...styles.title, fontFamily: bodyFamily }}>
+              <Text
+                style={{
+                  ...styles.title,
+                  fontFamily: titleFamily,
+                  color: accent,
+                  fontWeight: style.sectionTitleWeight,
+                  lineHeight: style.sectionTitleLineHeight,
+                }}
+              >
                 {header.title}
               </Text>
             ) : null}
             {header.tagline ? (
-              <Text style={{ ...styles.tagline, lineHeight: style.bodyLineHeight }}>
+              <Text
+                style={{
+                  ...styles.tagline,
+                  lineHeight: style.bodyLineHeight,
+                  fontWeight: style.bodyWeight,
+                }}
+              >
                 {header.tagline}
               </Text>
             ) : null}
@@ -239,6 +254,8 @@ export function ResumeDocument({
                     ...styles.sectionTitle,
                     color: accent,
                     fontFamily: titleFamily,
+                    fontWeight: style.sectionTitleWeight,
+                    lineHeight: style.sectionTitleLineHeight,
                   }}
                 >
                   {sections.experience.title}
@@ -247,6 +264,10 @@ export function ResumeDocument({
                   resume={resume}
                   bodyFamily={bodyFamily}
                   bodyLH={style.bodyLineHeight}
+                  subAccent={subAccent}
+                  subWeight={style.subTitleWeight}
+                  subLH={style.subTitleLineHeight}
+                  bodyWeight={style.bodyWeight}
                 />
               </View>
             )}
@@ -260,11 +281,20 @@ export function ResumeDocument({
                     ...styles.sectionTitle,
                     color: accent,
                     fontFamily: titleFamily,
+                    fontWeight: style.sectionTitleWeight,
+                    lineHeight: style.sectionTitleLineHeight,
                   }}
                 >
                   {sections[id].title}
                 </Text>
-                {renderRight(id, resume, bodyFamily, style.bodyLineHeight)}
+                {renderRight(id, resume, {
+                  bodyFamily,
+                  bodyLH: style.bodyLineHeight,
+                  subAccent,
+                  subWeight: style.subTitleWeight,
+                  subLH: style.subTitleLineHeight,
+                  bodyWeight: style.bodyWeight,
+                })}
               </View>
             ))}
           </View>
@@ -274,17 +304,19 @@ export function ResumeDocument({
   );
 }
 
-function renderRight(
-  id: SectionKind,
-  resume: Resume,
-  bodyFamily: string,
-  bodyLH: number,
-) {
-  if (id === "skills")
-    return <SkillsBlock resume={resume} bodyFamily={bodyFamily} bodyLH={bodyLH} />;
-  if (id === "education")
-    return <EducationBlock resume={resume} bodyFamily={bodyFamily} />;
-  if (id === "links") return <LinksBlock resume={resume} bodyFamily={bodyFamily} />;
+type PdfBodyCtx = {
+  bodyFamily: string;
+  bodyLH: number;
+  subAccent: string;
+  subWeight: number;
+  subLH: number;
+  bodyWeight: number;
+};
+
+function renderRight(id: SectionKind, resume: Resume, ctx: PdfBodyCtx) {
+  if (id === "skills") return <SkillsBlock resume={resume} {...ctx} />;
+  if (id === "education") return <EducationBlock resume={resume} {...ctx} />;
+  if (id === "links") return <LinksBlock resume={resume} {...ctx} />;
   return null;
 }
 
@@ -292,17 +324,31 @@ function ExperienceBlock({
   resume,
   bodyFamily,
   bodyLH,
+  subAccent,
+  subWeight,
+  subLH,
+  bodyWeight,
 }: {
   resume: Resume;
   bodyFamily: string;
   bodyLH: number;
+  subAccent: string;
+  subWeight: number;
+  subLH: number;
+  bodyWeight: number;
 }) {
   return (
     <View style={{ flexDirection: "column", gap: 16 }}>
       {resume.experience.map((e) => (
         <View key={e.id} style={styles.expItem}>
           <Text
-            style={{ ...styles.expTitle, color: C.inkStrong, fontFamily: bodyFamily }}
+            style={{
+              ...styles.expTitle,
+              color: subAccent,
+              fontFamily: bodyFamily,
+              fontWeight: subWeight,
+              lineHeight: subLH,
+            }}
           >
             {e.role}
             {e.role && e.company ? " — " : ""}
@@ -322,7 +368,13 @@ function ExperienceBlock({
                 .map((b) => (
                   <View key={b.id} style={styles.bulletRow}>
                     <Text style={{ ...styles.bulletDot, lineHeight: bodyLH }}>•</Text>
-                    <Text style={{ ...styles.bulletText, lineHeight: bodyLH }}>
+                    <Text
+                      style={{
+                        ...styles.bulletText,
+                        lineHeight: bodyLH,
+                        fontWeight: bodyWeight,
+                      }}
+                    >
                       {b.text}
                     </Text>
                   </View>
@@ -339,21 +391,41 @@ function SkillsBlock({
   resume,
   bodyFamily,
   bodyLH,
+  subAccent,
+  subWeight,
+  subLH,
+  bodyWeight,
 }: {
   resume: Resume;
   bodyFamily: string;
   bodyLH: number;
+  subAccent: string;
+  subWeight: number;
+  subLH: number;
+  bodyWeight: number;
 }) {
   return (
     <View>
       {resume.skillGroups.map((g) => (
         <View key={g.id} style={styles.skillGroup}>
           <Text
-            style={{ ...styles.subLabel, color: C.inkStrong, fontFamily: bodyFamily }}
+            style={{
+              ...styles.subLabel,
+              color: subAccent,
+              fontFamily: bodyFamily,
+              fontWeight: subWeight,
+              lineHeight: subLH,
+            }}
           >
             {g.label}
           </Text>
-          <Text style={{ ...styles.skillItems, lineHeight: bodyLH }}>
+          <Text
+            style={{
+              ...styles.skillItems,
+              lineHeight: bodyLH,
+              fontWeight: bodyWeight,
+            }}
+          >
             {g.items}
           </Text>
         </View>
@@ -365,9 +437,17 @@ function SkillsBlock({
 function EducationBlock({
   resume,
   bodyFamily,
+  subAccent,
+  subWeight,
+  subLH,
 }: {
   resume: Resume;
   bodyFamily: string;
+  bodyLH?: number;
+  subAccent: string;
+  subWeight: number;
+  subLH: number;
+  bodyWeight?: number;
 }) {
   return (
     <View style={{ flexDirection: "column", gap: 6 }}>
@@ -375,13 +455,25 @@ function EducationBlock({
         <View key={ed.id} style={styles.edItem}>
           <View>
             <Text
-              style={{ ...styles.edTitle, color: C.inkStrong, fontFamily: bodyFamily }}
+              style={{
+                ...styles.edTitle,
+                color: subAccent,
+                fontFamily: bodyFamily,
+                fontWeight: subWeight,
+                lineHeight: subLH,
+              }}
             >
               {ed.degree}
             </Text>
             {ed.field ? (
               <Text
-                style={{ ...styles.edTitle, color: C.inkStrong, fontFamily: bodyFamily }}
+                style={{
+                  ...styles.edTitle,
+                  color: subAccent,
+                  fontFamily: bodyFamily,
+                  fontWeight: subWeight,
+                  lineHeight: subLH,
+                }}
               >
                 {ed.field}
               </Text>
@@ -403,16 +495,30 @@ function EducationBlock({
 function LinksBlock({
   resume,
   bodyFamily,
+  subAccent,
+  subWeight,
+  subLH,
 }: {
   resume: Resume;
   bodyFamily: string;
+  bodyLH?: number;
+  subAccent: string;
+  subWeight: number;
+  subLH: number;
+  bodyWeight?: number;
 }) {
   return (
     <View>
       {resume.links.map((l) => (
         <View key={l.id} style={styles.linkGroup}>
           <Text
-            style={{ ...styles.linkLabel, color: C.inkStrong, fontFamily: bodyFamily }}
+            style={{
+              ...styles.linkLabel,
+              color: subAccent,
+              fontFamily: bodyFamily,
+              fontWeight: subWeight,
+              lineHeight: subLH,
+            }}
           >
             {l.label}
           </Text>

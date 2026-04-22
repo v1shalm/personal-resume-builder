@@ -59,10 +59,25 @@ export type Header = {
 export type Style = {
   titleFontId: string;
   bodyFontId: string;
-  accentColor: string; // hex like #23316d — used for the name heading
-  nameFontWeight: number; // 400–800
-  nameLetterSpacing: number; // em units, e.g. -0.024
-  bodyLineHeight: number; // unitless, e.g. 1.55
+
+  // Theme — pair of accent colors. `accent` is used for the name and
+  // section titles; `subAccent` is used for entry titles (role — company,
+  // group labels, etc.), rendered slightly lighter so hierarchy lands on
+  // the name and section headers first.
+  themeId: string;
+  accentColor: string;
+  subAccentColor: string;
+
+  // Typography — weight + line-height per hierarchy level.
+  nameFontWeight: number;
+  sectionTitleWeight: number;
+  subTitleWeight: number;
+  bodyWeight: number;
+
+  nameLetterSpacing: number; // em units
+  bodyLineHeight: number;    // unitless
+  sectionTitleLineHeight: number;
+  subTitleLineHeight: number;
 };
 
 export type Resume = {

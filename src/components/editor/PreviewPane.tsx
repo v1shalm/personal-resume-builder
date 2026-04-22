@@ -23,10 +23,12 @@ export function PreviewPane() {
     const fit = () => {
       const container = document.getElementById("preview-scroll");
       if (!container) return;
-      const availableW = container.clientWidth - 96;
-      const availableH = container.clientHeight - 96;
+      // Padding ring around the paper varies by breakpoint (16/32/48 px).
+      const pad = container.clientWidth < 640 ? 32 : container.clientWidth < 768 ? 64 : 96;
+      const availableW = container.clientWidth - pad;
+      const availableH = container.clientHeight - pad;
       const scale = Math.min(availableW / PAGE_W, availableH / PAGE_H, 1);
-      setZoom(Math.max(0.4, scale));
+      setZoom(Math.max(0.3, scale));
     };
     fit();
     window.addEventListener("resize", fit);
@@ -37,7 +39,7 @@ export function PreviewPane() {
 
   return (
     <div
-      className="relative flex min-w-0 flex-col overflow-hidden"
+      className="relative flex min-w-0 flex-col overflow-hidden border-b border-ink-border md:border-b-0"
       style={{ background: "var(--canvas-bg)" }}
     >
       <FontLoader
@@ -65,7 +67,7 @@ export function PreviewPane() {
       />
 
       <div id="preview-scroll" className="relative z-10 flex-1 overflow-auto">
-        <div className="flex min-h-full items-start justify-center p-12">
+        <div className="flex min-h-full items-start justify-center p-4 sm:p-8 md:p-12">
           <motion.div
             layout
             transition={spring.soft}
@@ -90,7 +92,7 @@ export function PreviewPane() {
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ ...spring.soft, delay: 0.1 }}
         className={cn(
-          "absolute bottom-6 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1 p-1.5 backdrop-blur-md",
+          "absolute bottom-3 left-1/2 z-20 flex -translate-x-1/2 items-center gap-0.5 p-1 backdrop-blur-md sm:bottom-5 sm:gap-1 sm:p-1.5",
           "rounded-full border border-ink-border bg-overlay",
           "shadow-[inset_0_1px_0_var(--shadow-highlight),0_2px_4px_var(--shadow-drop-close),0_12px_28px_-8px_var(--shadow-drop-far)]",
         )}
@@ -147,7 +149,7 @@ export function PreviewPane() {
                   "text-ink-text bg-card",
                   "shadow-[inset_0_1px_0_var(--shadow-highlight),inset_0_-1px_0_var(--shadow-edge-dark),0_0_0_1px_var(--ink-border),0_1px_2px_var(--shadow-drop-close)]",
                 ].join(" ")
-              : "text-ink-muted hover:bg-ink-surfaceHi hover:text-ink-text",
+              : "text-ink-muted hover:bg-ink-hover hover:text-ink-text",
           )}
         >
           <Maximize2 className="h-3 w-3" aria-hidden />
@@ -176,7 +178,7 @@ function ToolbarIconButton({
       whileTap={disabled ? undefined : { scale: 0.9 }}
       transition={spring.press}
       aria-label={label}
-      className="flex h-8 w-8 items-center justify-center rounded-full text-ink-muted transition-colors duration-150 hover:bg-ink-surfaceHi hover:text-ink-text disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-ink-muted"
+      className="flex h-8 w-8 items-center justify-center rounded-full text-ink-muted transition-colors duration-150 hover:bg-ink-hover hover:text-ink-text disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-ink-muted"
     >
       {children}
     </motion.button>

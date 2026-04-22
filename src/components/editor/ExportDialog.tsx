@@ -102,7 +102,9 @@ export function ExportDialog({
       onOpenChange(false);
     } catch (err) {
       console.error(err);
-      alert("Export failed. Check the console for details.");
+      alert(
+        "Couldn't create the PDF. Try toggling the font in Header → Typography to a Google font, then export again.",
+      );
     } finally {
       setExporting(false);
     }
@@ -114,7 +116,7 @@ export function ExportDialog({
         <DialogHeader>
           <DialogTitle>Export PDF</DialogTitle>
           <DialogDescription>
-            Vector text, selectable, ATS-safe. Fonts are embedded.
+            Text stays searchable and copy-pastable, so résumé scanners can read it.
           </DialogDescription>
         </DialogHeader>
 
@@ -145,8 +147,8 @@ export function ExportDialog({
               onCheckedChange={(v) => setOpts({ ...opts, includeHyperlinks: v })}
             />
             <Row
-              label="Subset embedded fonts"
-              hint="Embed only the glyphs used. Smaller file — recommended."
+              label="Trim unused characters from fonts"
+              hint="Keeps only the letters your resume actually uses. Smaller file — recommended."
               checked={opts.subsetFonts}
               onCheckedChange={(v) => setOpts({ ...opts, subsetFonts: v })}
             />
@@ -178,8 +180,8 @@ export function ExportDialog({
 
           <div className="rounded-lg border border-ink-border bg-ink-bg/60 px-4 py-3">
             <p className="text-[12.5px] leading-[1.55] text-ink-muted">
-              Exported PDFs render in a built-in ATS-safe face (Helvetica). Your
-              chosen fonts apply to the on-screen preview only.
+              The exported PDF uses Helvetica so it reads cleanly through résumé
+              scanners (ATS). Your chosen fonts still apply to the preview.
             </p>
           </div>
         </div>

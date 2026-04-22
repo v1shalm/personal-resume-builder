@@ -20,13 +20,13 @@ const buttonVariants = cva(
           "hover:shadow-[inset_0_1px_0_oklch(1_0_0_/_0.4),inset_0_-1px_0_oklch(0.4_0.08_70_/_0.2),0_0_0_1px_oklch(0.55_0.12_75_/_0.4),0_3px_8px_-2px_oklch(0_0_0_/_0.5)]",
         ].join(" "),
         secondary:
-          "bg-ink-raised text-ink-text border border-ink-border hover:bg-[oklch(0.26_0.006_250)] hover:border-ink-borderStrong",
+          "bg-ink-raised text-ink-text border border-ink-border hover:bg-ink-hover hover:border-ink-borderStrong",
         ghost:
-          "bg-transparent text-ink-muted hover:bg-ink-raised hover:text-ink-text",
+          "bg-transparent text-ink-muted hover:bg-ink-hover hover:text-ink-text",
         outline:
-          "bg-transparent border border-ink-border text-ink-text hover:bg-ink-raised hover:border-ink-borderStrong",
+          "bg-transparent border border-ink-border text-ink-text hover:bg-ink-hover hover:border-ink-borderStrong",
         danger:
-          "bg-transparent text-ink-danger hover:bg-[oklch(0.22_0.04_25)]",
+          "bg-transparent text-ink-danger hover:bg-ink-hoverDanger",
       },
       size: {
         sm: "h-8 px-3 text-[12.5px]",

@@ -149,9 +149,16 @@ export const seedResume: Resume = {
   style: {
     titleFontId: "source-serif",
     bodyFontId: "geist",
+    themeId: "navy",
     accentColor: "#23316d",
+    subAccentColor: "#525c87",
     nameFontWeight: 500,
+    sectionTitleWeight: 600,
+    subTitleWeight: 700,
+    bodyWeight: 400,
     nameLetterSpacing: -0.024,
     bodyLineHeight: 1.55,
+    sectionTitleLineHeight: 1.1,
+    subTitleLineHeight: 1.3,
   },
 };

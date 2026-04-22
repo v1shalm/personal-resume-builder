@@ -110,9 +110,9 @@ export function ColorPicker({ value, onChange, ...rest }: Props) {
                 if (!isValidHex(draft)) setDraft(value);
               }}
               className={cn(
-                "h-9 flex-1 rounded-lg border border-ink-border bg-ink-bgDeep px-3 text-[13px] tabular-nums text-ink-text shadow-well",
+                "h-9 flex-1 rounded-lg border border-[var(--input-border)] bg-input px-3 text-[13px] tabular-nums text-ink-text shadow-well-t",
                 "transition-[border-color,box-shadow] duration-150 hover:border-ink-borderStrong",
-                "focus:border-[oklch(0.5_0.04_85_/_0.55)] focus:shadow-[inset_0_1px_1px_oklch(0_0_0_/_0.18),0_0_0_3px_oklch(0.855_0.165_85_/_0.16)] focus:outline-none",
+                "focus:border-[var(--input-focus-border)] focus:shadow-[inset_0_1.5px_2px_var(--input-shadow-top),0_0_0_3px_var(--input-focus-ring)] focus:outline-none",
               )}
               placeholder="#000000"
               aria-label="Hex value"

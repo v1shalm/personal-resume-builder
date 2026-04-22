@@ -2,10 +2,11 @@
 
 import { useResumeStore } from "@/lib/store";
 import { Input } from "@/components/ui/Input";
-import { AutoTextarea } from "@/components/ui/AutoTextarea";
+import { TokenInput } from "@/components/ui/TokenInput";
 import { SortableList, DragHandle } from "../SortableList";
 import { SectionHeader, EmptyState } from "./ExperienceEditor";
 import { Trash2 } from "lucide-react";
+import { SKILL_SUGGESTIONS } from "@/lib/skill-suggestions";
 
 export function SkillsEditor() {
   const groups = useResumeStore((s) => s.resume.skillGroups);
@@ -20,7 +21,7 @@ export function SkillsEditor() {
       {groups.length === 0 ? (
         <EmptyState
           label="No skill groups yet."
-          hint="Group skills by category — e.g., Design, Tools, Code."
+          hint="Group your skills by category — e.g. Design, Tools, Research."
         />
       ) : (
         <SortableList
@@ -35,26 +36,31 @@ export function SkillsEditor() {
                   className="h-8 flex-1 border-transparent bg-transparent text-[13.5px] font-semibold shadow-none hover:border-ink-border focus:shadow-none"
                   value={g.label}
                   onChange={(e) => update(g.id, { label: e.target.value })}
-                  placeholder="Group name"
+                  placeholder="e.g. Design, Tools & Technologies"
                 />
                 <button
                   type="button"
                   onClick={() => {
-                    if (confirm(`Remove ${g.label || "group"}?`)) remove(g.id);
+                    if (
+                      confirm(
+                        `Delete the ${g.label || "skill"} group?\n\nAll of its items will be removed. Can't be undone.`,
+                      )
+                    )
+                      remove(g.id);
                   }}
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-surface hover:text-ink-danger"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                   aria-label={`Remove ${g.label || "group"}`}
                 >
                   <Trash2 className="h-3.5 w-3.5" aria-hidden />
                 </button>
               </div>
               <div className="p-4">
-                <AutoTextarea
-                  aria-label="Skills list"
-                  minRows={2}
+                <TokenInput
+                  aria-label={`Skills in ${g.label || "this group"}`}
                   value={g.items}
-                  onChange={(e) => update(g.id, { items: e.target.value })}
-                  placeholder="Comma-separated: Visual Design, User Research, Usability Testing"
+                  onChange={(items) => update(g.id, { items })}
+                  suggestions={SKILL_SUGGESTIONS}
+                  placeholder="Type a skill and press Enter…"
                 />
               </div>
             </article>

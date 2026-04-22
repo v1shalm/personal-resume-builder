@@ -34,6 +34,13 @@
   --ink-accent-text: oklch(0.22 0.05 75);
   --ink-danger: oklch(0.56 0.19 25);
 
+  /* Hover surfaces — calibrated per theme so a hover is always visible.
+     In light mode `raised`/`surface` are near-white, so we step DOWN to a
+     clearly darker gray; in dark mode we step UP. Danger is a tinted red
+     so destructive hovers read as intent, not just brightness. */
+  --ink-hover: oklch(0.925 0.005 250);
+  --ink-hover-danger: oklch(0.945 0.045 25);
+
   /* Body + canvas */
   --body-top: oklch(0.995 0.002 250);
   --body-bot: oklch(0.965 0.004 250);
@@ -106,6 +113,9 @@
   --ink-accent: oklch(0.855 0.165 85);
   --ink-accent-text: oklch(0.22 0.05 75);
   --ink-danger: oklch(0.66 0.17 25);
+
+  --ink-hover: oklch(0.285 0.007 250);
+  --ink-hover-danger: oklch(0.26 0.06 25);
 
   --body-top: oklch(0.2 0.006 250);
   --body-bot: oklch(0.165 0.004 250);
@@ -319,6 +329,7 @@
     color: oklch(0.22 0.008 260);
     font-feature-settings: "ss01", "cv11";
   }
+
 
   /* Rule with fading edges — theme-aware */
   .rule-fade {

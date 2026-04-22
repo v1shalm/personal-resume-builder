@@ -433,11 +433,11 @@ export const useResumeStore = create<Store>()(
         set({ resume, selection: { kind: "header" } }),
     }),
     {
-      name: "resume-builder:v4",
-      version: 4,
+      name: "resume-builder:v5",
+      version: 5,
       partialize: (s) => ({ resume: s.resume }),
       migrate: (persistedState: unknown, version: number) => {
-        if (version < 4) return { resume: seedResume };
+        if (version < 5) return { resume: seedResume };
         return persistedState as { resume: Resume };
       },
     },

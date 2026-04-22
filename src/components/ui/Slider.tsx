@@ -5,7 +5,12 @@ import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "@/lib/utils";
 
 const TICK_COUNT = 11;
-const THUMB_HALF_PX = 11;
+// Thumb is smaller than the track so there's a clear "pocket" of pill color
+// around it on every side (matching the reference). FILL_EXTEND_PX is the
+// distance past the thumb CENTER where the fill ends — so ~8–10px of fill
+// is visible past the thumb's right edge at every value.
+const THUMB_SIZE_PX = 16;
+const FILL_EXTEND_PX = 16;
 
 type Props = React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>;
 
@@ -63,15 +68,16 @@ export const Slider = React.forwardRef<
             "shadow-[inset_0_1px_0_oklch(1_0_0_/_0.38),inset_0_-1px_0_oklch(0.4_0.1_70_/_0.3),0_0_0_0.5px_oklch(0.55_0.12_75_/_0.55)]",
           )}
           style={{
-            width: `min(calc(${pct}% + ${THUMB_HALF_PX}px), calc(100% - 3px))`,
-            minWidth: `${THUMB_HALF_PX * 2}px`,
+            width: `min(calc(${pct}% + ${FILL_EXTEND_PX}px), calc(100% - 3px))`,
+            minWidth: `${FILL_EXTEND_PX * 2}px`,
           }}
         />
       </SliderPrimitive.Track>
 
       <SliderPrimitive.Thumb
+        style={{ height: THUMB_SIZE_PX, width: THUMB_SIZE_PX }}
         className={cn(
-          "relative block h-[20px] w-[20px] rounded-full",
+          "relative block rounded-full",
           // Base white orb
           "bg-[linear-gradient(180deg,oklch(0.995_0.002_85)_0%,oklch(0.955_0.005_85)_100%)]",
           // Layered shadow stack:

@@ -12,6 +12,7 @@ type Props = {
   step: number;
   precision?: number; // decimals in the input
   suffix?: string; // displayed inside input (e.g., "em")
+  disabled?: boolean;
   "aria-label": string;
 };
 
@@ -23,6 +24,7 @@ export function SliderField({
   step,
   precision = 2,
   suffix,
+  disabled = false,
   ...rest
 }: Props) {
   const [draft, setDraft] = React.useState(value.toFixed(precision));
@@ -42,7 +44,13 @@ export function SliderField({
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div
+      className={cn(
+        "flex items-center gap-3 transition-opacity duration-200",
+        disabled && "pointer-events-none opacity-40",
+      )}
+      aria-disabled={disabled}
+    >
       <div className="flex-1 pl-[2px] pr-[2px]">
         <Slider
           aria-label={rest["aria-label"]}
@@ -51,6 +59,7 @@ export function SliderField({
           min={min}
           max={max}
           step={step}
+          disabled={disabled}
         />
       </div>
       <div
@@ -73,7 +82,8 @@ export function SliderField({
               (e.target as HTMLInputElement).blur();
             }
           }}
-          className="h-full w-full bg-transparent text-right text-[12.5px] tabular-nums text-ink-text placeholder:text-ink-subtle focus:outline-none"
+          disabled={disabled}
+          className="h-full w-full bg-transparent text-right text-[12.5px] tabular-nums text-ink-text placeholder:text-ink-subtle focus:outline-none disabled:cursor-not-allowed"
         />
         {suffix && (
           <span className="pl-1 text-[11px] text-ink-subtle">{suffix}</span>

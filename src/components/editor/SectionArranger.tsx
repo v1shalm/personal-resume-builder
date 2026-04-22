@@ -24,7 +24,7 @@ export function SectionArranger() {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-controls="section-arranger-body"
-        className="flex w-full items-center justify-between px-5 py-3 text-left transition-colors duration-150 hover:bg-ink-surfaceHi"
+        className="flex w-full items-center justify-between px-5 py-3 text-left transition-colors duration-150 hover:bg-ink-hover"
       >
         <div className="flex flex-col items-start gap-0.5">
           <span className="text-[12.5px] font-medium text-ink-text">
@@ -80,8 +80,8 @@ export function SectionArranger() {
                       className={cn(
                         "flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-150",
                         item.visible
-                          ? "text-ink-muted hover:bg-ink-surface hover:text-ink-text"
-                          : "text-ink-danger hover:bg-[oklch(0.22_0.04_25)]",
+                          ? "text-ink-muted hover:bg-ink-hover hover:text-ink-text"
+                          : "text-ink-danger hover:bg-ink-hoverDanger",
                       )}
                       aria-pressed={!item.visible}
                       aria-label={item.visible ? `Hide ${item.title}` : `Show ${item.title}`}

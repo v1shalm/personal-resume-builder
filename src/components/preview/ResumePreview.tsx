@@ -44,6 +44,7 @@ export function ResumePreview({ resume }: Props) {
   const titleFamily = `'${fontById(style.titleFontId).family}', var(--font-sans)`;
   const bodyFamily = `'${fontById(style.bodyFontId).family}', var(--font-sans)`;
   const accent = style.accentColor;
+  const subAccent = style.subAccentColor;
   const bodyLH = style.bodyLineHeight;
 
   const hasItems = (id: SectionKind) => {
@@ -88,11 +89,13 @@ export function ResumePreview({ resume }: Props) {
             <p
               className="mt-3"
               style={{
-                fontFamily: bodyFamily,
+                // Role under the name shares the Section-title treatment:
+                // theme font, theme accent color, section-title weight + lh.
+                fontFamily: titleFamily,
                 fontSize: T.title,
-                fontWeight: 600,
-                color: COLOR.inkStrong,
-                lineHeight: 1.2,
+                fontWeight: style.sectionTitleWeight,
+                color: accent,
+                lineHeight: style.sectionTitleLineHeight,
                 letterSpacing: "-0.005em",
               }}
             >
@@ -105,6 +108,7 @@ export function ResumePreview({ resume }: Props) {
               style={{
                 fontSize: T.tagline,
                 color: COLOR.body,
+                fontWeight: style.bodyWeight,
                 lineHeight: bodyLH,
               }}
             >
@@ -155,8 +159,18 @@ export function ResumePreview({ resume }: Props) {
               title={sections.experience.title}
               titleFamily={titleFamily}
               accent={accent}
+              weight={style.sectionTitleWeight}
+              lineHeight={style.sectionTitleLineHeight}
             >
-              <ExperienceList resume={resume} bodyFamily={bodyFamily} bodyLH={bodyLH} />
+              <ExperienceList
+                resume={resume}
+                bodyFamily={bodyFamily}
+                bodyLH={bodyLH}
+                subAccent={subAccent}
+                subWeight={style.subTitleWeight}
+                subLH={style.subTitleLineHeight}
+                bodyWeight={style.bodyWeight}
+              />
             </Section>
           )}
         </div>
@@ -168,8 +182,17 @@ export function ResumePreview({ resume }: Props) {
               title={sections[id].title}
               titleFamily={titleFamily}
               accent={accent}
+              weight={style.sectionTitleWeight}
+              lineHeight={style.sectionTitleLineHeight}
             >
-              {renderSection(id, resume, bodyFamily, bodyLH)}
+              {renderSection(id, resume, {
+                bodyFamily,
+                bodyLH,
+                subAccent,
+                subWeight: style.subTitleWeight,
+                subLH: style.subTitleLineHeight,
+                bodyWeight: style.bodyWeight,
+              })}
             </Section>
           ))}
         </div>
@@ -178,17 +201,48 @@ export function ResumePreview({ resume }: Props) {
   );
 }
 
-function renderSection(
-  id: SectionKind,
-  resume: Resume,
-  bodyFamily: string,
-  bodyLH: number,
-) {
+type BodyCtx = {
+  bodyFamily: string;
+  bodyLH: number;
+  subAccent: string;
+  subWeight: number;
+  subLH: number;
+  bodyWeight: number;
+};
+
+function renderSection(id: SectionKind, resume: Resume, ctx: BodyCtx) {
   if (id === "skills")
-    return <SkillsList resume={resume} bodyFamily={bodyFamily} bodyLH={bodyLH} />;
+    return (
+      <SkillsList
+        resume={resume}
+        bodyFamily={ctx.bodyFamily}
+        bodyLH={ctx.bodyLH}
+        subAccent={ctx.subAccent}
+        subWeight={ctx.subWeight}
+        subLH={ctx.subLH}
+        bodyWeight={ctx.bodyWeight}
+      />
+    );
   if (id === "education")
-    return <EducationList resume={resume} bodyFamily={bodyFamily} />;
-  if (id === "links") return <LinksList resume={resume} bodyFamily={bodyFamily} />;
+    return (
+      <EducationList
+        resume={resume}
+        bodyFamily={ctx.bodyFamily}
+        subAccent={ctx.subAccent}
+        subWeight={ctx.subWeight}
+        subLH={ctx.subLH}
+      />
+    );
+  if (id === "links")
+    return (
+      <LinksList
+        resume={resume}
+        bodyFamily={ctx.bodyFamily}
+        subAccent={ctx.subAccent}
+        subWeight={ctx.subWeight}
+        subLH={ctx.subLH}
+      />
+    );
   return null;
 }
 
@@ -197,11 +251,15 @@ function Section({
   children,
   titleFamily,
   accent,
+  weight,
+  lineHeight,
 }: {
   title: string;
   children: React.ReactNode;
   titleFamily: string;
   accent: string;
+  weight: number;
+  lineHeight: number;
 }) {
   return (
     <section className="flex flex-col gap-4">
@@ -209,10 +267,10 @@ function Section({
         style={{
           fontFamily: titleFamily,
           fontSize: T.sectionHeader,
-          fontWeight: 600,
+          fontWeight: weight,
           letterSpacing: "-0.012em",
           color: accent,
-          lineHeight: 1.1,
+          lineHeight,
         }}
       >
         {title}
@@ -226,10 +284,18 @@ function ExperienceList({
   resume,
   bodyFamily,
   bodyLH,
+  subAccent,
+  subWeight,
+  subLH,
+  bodyWeight,
 }: {
   resume: Resume;
   bodyFamily: string;
   bodyLH: number;
+  subAccent: string;
+  subWeight: number;
+  subLH: number;
+  bodyWeight: number;
 }) {
   return (
     <div className="flex flex-col gap-[22px]">
@@ -239,9 +305,9 @@ function ExperienceList({
             style={{
               fontFamily: bodyFamily,
               fontSize: T.entryTitle,
-              fontWeight: 700,
-              color: COLOR.inkStrong,
-              lineHeight: 1.3,
+              fontWeight: subWeight,
+              color: subAccent,
+              lineHeight: subLH,
               letterSpacing: "-0.005em",
             }}
           >
@@ -275,6 +341,7 @@ function ExperienceList({
                       fontSize: T.body,
                       color: COLOR.body,
                       lineHeight: bodyLH,
+                      fontWeight: bodyWeight,
                     }}
                   >
                     <span
@@ -297,10 +364,18 @@ function SkillsList({
   resume,
   bodyFamily,
   bodyLH,
+  subAccent,
+  subWeight,
+  subLH,
+  bodyWeight,
 }: {
   resume: Resume;
   bodyFamily: string;
   bodyLH: number;
+  subAccent: string;
+  subWeight: number;
+  subLH: number;
+  bodyWeight: number;
 }) {
   return (
     <div className="flex flex-col gap-5">
@@ -310,9 +385,9 @@ function SkillsList({
             style={{
               fontFamily: bodyFamily,
               fontSize: T.subLabel,
-              fontWeight: 700,
-              color: COLOR.inkStrong,
-              lineHeight: 1.25,
+              fontWeight: subWeight,
+              color: subAccent,
+              lineHeight: subLH,
               letterSpacing: "-0.005em",
             }}
           >
@@ -323,6 +398,7 @@ function SkillsList({
               fontSize: T.body,
               color: COLOR.body,
               lineHeight: bodyLH,
+              fontWeight: bodyWeight,
             }}
           >
             {g.items}
@@ -336,9 +412,15 @@ function SkillsList({
 function EducationList({
   resume,
   bodyFamily,
+  subAccent,
+  subWeight,
+  subLH,
 }: {
   resume: Resume;
   bodyFamily: string;
+  subAccent: string;
+  subWeight: number;
+  subLH: number;
 }) {
   return (
     <div className="flex flex-col gap-5">
@@ -348,9 +430,9 @@ function EducationList({
             style={{
               fontFamily: bodyFamily,
               fontSize: T.subLabel,
-              fontWeight: 700,
-              color: COLOR.inkStrong,
-              lineHeight: 1.3,
+              fontWeight: subWeight,
+              color: subAccent,
+              lineHeight: subLH,
               letterSpacing: "-0.005em",
             }}
           >
@@ -379,9 +461,15 @@ function EducationList({
 function LinksList({
   resume,
   bodyFamily,
+  subAccent,
+  subWeight,
+  subLH,
 }: {
   resume: Resume;
   bodyFamily: string;
+  subAccent: string;
+  subWeight: number;
+  subLH: number;
 }) {
   return (
     <div className="flex flex-col gap-5">
@@ -391,9 +479,9 @@ function LinksList({
             style={{
               fontFamily: bodyFamily,
               fontSize: T.linkLabel,
-              fontWeight: 700,
-              color: COLOR.inkStrong,
-              lineHeight: 1.25,
+              fontWeight: subWeight,
+              color: subAccent,
+              lineHeight: subLH,
               letterSpacing: "-0.005em",
             }}
           >

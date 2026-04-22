@@ -17,10 +17,9 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { rowFadeUp } from "@/lib/motion";
 
 type SortableListProps<T extends { id: string }> = {
   items: T[];
@@ -54,13 +53,11 @@ export function SortableList<T extends { id: string }>({
     >
       <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-2">
-          <AnimatePresence initial={false}>
-            {items.map((item) => (
-              <SortableItem key={item.id} id={item.id}>
-                {(handleProps) => renderItem(item, handleProps)}
-              </SortableItem>
-            ))}
-          </AnimatePresence>
+          {items.map((item) => (
+            <SortableItem key={item.id} id={item.id}>
+              {(handleProps) => renderItem(item, handleProps)}
+            </SortableItem>
+          ))}
         </div>
       </SortableContext>
     </DndContext>
@@ -80,16 +77,9 @@ function SortableItem({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
   return (
-    <motion.div
+    <div
       ref={setNodeRef}
-      variants={rowFadeUp}
-      initial="hidden"
-      animate="show"
-      exit="exit"
       style={{
-        // Compose dnd-kit transform with motion's opacity/filter. We use style
-        // (not animate) for dnd-kit's transform so it doesn't fight motion's
-        // spring on active drag.
         transform: CSS.Transform.toString(transform) || undefined,
         transition,
       }}
@@ -102,7 +92,7 @@ function SortableItem({
         dragAttrs: attributes as unknown as Record<string, unknown>,
         dragListeners: listeners as unknown as Record<string, unknown> | undefined,
       })}
-    </motion.div>
+    </div>
   );
 }
 
@@ -123,7 +113,8 @@ export function DragHandle({
       whileTap={{ scale: 0.92 }}
       transition={{ type: "spring", stiffness: 500, damping: 26, mass: 0.5 }}
       className={cn(
-        "flex h-8 w-7 shrink-0 cursor-grab items-center justify-center rounded-md text-ink-muted/60 transition-colors duration-150 hover:bg-ink-bg hover:text-ink-text active:cursor-grabbing",
+        // Touch-friendly hit area (40×40 on mobile) with smaller painted chrome
+        "flex h-10 w-10 shrink-0 cursor-grab items-center justify-center rounded-md text-ink-muted/60 transition-colors duration-150 hover:bg-ink-hover hover:text-ink-text active:cursor-grabbing sm:h-8 sm:w-7",
         className,
       )}
       {...dragAttrs}

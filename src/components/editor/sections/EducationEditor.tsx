@@ -20,7 +20,7 @@ export function EducationEditor() {
       {items.length === 0 ? (
         <EmptyState
           label="No education yet."
-          hint="Degrees, certifications, meaningful coursework."
+          hint="Add degrees, certifications, or coursework that's relevant."
         />
       ) : (
         <SortableList
@@ -35,14 +35,19 @@ export function EducationEditor() {
                   className="h-8 flex-1 border-transparent bg-transparent text-[13.5px] font-semibold shadow-none hover:border-ink-border focus:shadow-none"
                   value={ed.degree}
                   onChange={(e) => update(ed.id, { degree: e.target.value })}
-                  placeholder="Degree"
+                  placeholder="e.g. Bachelor in Science"
                 />
                 <button
                   type="button"
                   onClick={() => {
-                    if (confirm(`Remove ${ed.degree || "entry"}?`)) remove(ed.id);
+                    if (
+                      confirm(
+                        `Delete ${ed.degree || "this entry"}?\n\nCan't be undone.`,
+                      )
+                    )
+                      remove(ed.id);
                   }}
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-surface hover:text-ink-danger"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                   aria-label={`Remove ${ed.degree || "entry"}`}
                 >
                   <Trash2 className="h-3.5 w-3.5" aria-hidden />
@@ -53,14 +58,14 @@ export function EducationEditor() {
                   <Input
                     value={ed.field}
                     onChange={(e) => update(ed.id, { field: e.target.value })}
-                    placeholder="Information Technology"
+                    placeholder="e.g. Information Technology"
                   />
                 </Field>
                 <Field label="Year">
                   <Input
                     value={ed.year}
                     onChange={(e) => update(ed.id, { year: e.target.value })}
-                    placeholder="2020"
+                    placeholder="e.g. 2017 – 2020"
                   />
                 </Field>
                 <div className="col-span-2">
@@ -68,7 +73,7 @@ export function EducationEditor() {
                     <Input
                       value={ed.institution}
                       onChange={(e) => update(ed.id, { institution: e.target.value })}
-                      placeholder="University of Mumbai"
+                      placeholder="e.g. Mumbai University"
                     />
                   </Field>
                 </div>

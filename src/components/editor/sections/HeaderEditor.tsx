@@ -4,8 +4,17 @@ import { useResumeStore } from "@/lib/store";
 import { Input, Textarea, Label } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { SortableList, DragHandle } from "../SortableList";
-import { Plus, Trash2 } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Mail,
+  Link as LinkIcon,
+  Phone,
+  Check,
+  AlertCircle,
+} from "lucide-react";
 import { StyleEditor } from "./StyleEditor";
+import { autoHref, detectKind, validateContact } from "@/lib/contact-detect";
 
 export function HeaderEditor() {
   const header = useResumeStore((s) => s.resume.header);
@@ -33,19 +42,24 @@ export function HeaderEditor() {
         />
       </Field>
 
-      <Field label="Tagline" hint="Keep it one to two sentences.">
+      <Field label="Summary" hint="One or two sentences about you.">
         <Textarea
           rows={3}
           value={header.tagline}
           onChange={(e) => updateHeader({ tagline: e.target.value })}
-          placeholder="What you do, in your own words."
+          placeholder="What you do and what you bring to a team."
         />
       </Field>
 
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <Label>Contacts</Label>
-          <Button variant="ghost" size="sm" onClick={addContact} aria-label="Add contact">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={addContact}
+            aria-label="Add contact"
+          >
             <Plus className="h-3.5 w-3.5" aria-hidden />
             Add
           </Button>
@@ -54,40 +68,13 @@ export function HeaderEditor() {
           items={header.contacts}
           onReorder={reorderContacts}
           renderItem={(c, { dragAttrs, dragListeners }) => (
-            <div className="group flex items-center gap-2 rounded-lg border border-ink-border bg-card p-2 shadow-raised-t">
-              <DragHandle dragAttrs={dragAttrs} dragListeners={dragListeners} />
-              <Input
-                aria-label="Contact label"
-                className="h-8 w-24 shrink-0 border-transparent bg-transparent text-[12px] text-ink-muted shadow-none hover:border-ink-border focus:shadow-none"
-                value={c.label}
-                onChange={(e) => updateContact(c.id, { label: e.target.value })}
-                placeholder="label"
-              />
-              <Input
-                aria-label="Contact value"
-                className="h-8 flex-1 border-transparent bg-transparent shadow-none hover:border-ink-border focus:shadow-none"
-                value={c.value}
-                onChange={(e) => updateContact(c.id, { value: e.target.value })}
-                placeholder="value"
-              />
-              <Input
-                aria-label="Link (optional)"
-                className="h-8 w-40 shrink-0 border-transparent bg-transparent text-[12px] text-ink-muted shadow-none hover:border-ink-border focus:shadow-none"
-                value={c.href ?? ""}
-                onChange={(e) =>
-                  updateContact(c.id, { href: e.target.value || undefined })
-                }
-                placeholder="https:// (optional)"
-              />
-              <button
-                type="button"
-                onClick={() => removeContact(c.id)}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-surface hover:text-ink-danger"
-                aria-label={`Remove ${c.label || "contact"}`}
-              >
-                <Trash2 className="h-3.5 w-3.5" aria-hidden />
-              </button>
-            </div>
+            <ContactRow
+              contact={c}
+              onUpdate={(patch) => updateContact(c.id, patch)}
+              onRemove={() => removeContact(c.id)}
+              dragAttrs={dragAttrs}
+              dragListeners={dragListeners}
+            />
           )}
         />
       </section>
@@ -117,6 +104,97 @@ export function Field({
         ) : null}
       </div>
       {children}
+    </div>
+  );
+}
+
+// Contact row with live validation + auto-detection of email / URL / phone.
+// As you type a value the row picks a matching icon and, when the optional
+// `href` is empty, auto-fills it with the clickable form (mailto:, tel:,
+// or https://).
+function ContactRow({
+  contact,
+  onUpdate,
+  onRemove,
+  dragAttrs,
+  dragListeners,
+}: {
+  contact: { id: string; label: string; value: string; href?: string };
+  onUpdate: (patch: Partial<{ label: string; value: string; href?: string }>) => void;
+  onRemove: () => void;
+  dragAttrs: Record<string, unknown>;
+  dragListeners: Record<string, unknown> | undefined;
+}) {
+  const kind = detectKind(contact.value);
+  const validationMsg = validateContact(contact.value);
+
+  const onValueChange = (next: string) => {
+    const patch: Partial<{ value: string; href?: string }> = { value: next };
+    // Auto-fill href only when user hasn't set their own
+    if (!contact.href) {
+      const suggestion = autoHref(next);
+      if (suggestion) patch.href = suggestion;
+    }
+    onUpdate(patch);
+  };
+
+  const KindIcon =
+    kind === "email" ? Mail : kind === "url" ? LinkIcon : kind === "phone" ? Phone : null;
+  const hasRightGlyph =
+    Boolean(contact.value.trim()) && (Boolean(validationMsg) || kind !== "text");
+
+  return (
+    <div className="group flex items-center gap-2 rounded-lg border border-ink-border bg-card p-2 shadow-raised-t">
+      <DragHandle dragAttrs={dragAttrs} dragListeners={dragListeners} />
+      <Input
+        aria-label="Contact type"
+        className="h-8 w-24 shrink-0 border-transparent bg-transparent text-[12px] text-ink-muted shadow-none hover:border-ink-border focus:shadow-none"
+        value={contact.label}
+        onChange={(e) => onUpdate({ label: e.target.value })}
+        placeholder="e.g. email"
+      />
+      <div className="relative flex flex-1 items-center">
+        {KindIcon && (
+          <KindIcon
+            className="pointer-events-none absolute left-2 h-3.5 w-3.5 text-ink-muted"
+            aria-hidden
+          />
+        )}
+        <Input
+          aria-label="Contact details"
+          className={[
+            "h-8 flex-1 border-transparent bg-transparent shadow-none hover:border-ink-border focus:shadow-none",
+            KindIcon ? "pl-7" : "",
+            hasRightGlyph ? "pr-7" : "",
+          ].join(" ")}
+          value={contact.value}
+          onChange={(e) => onValueChange(e.target.value)}
+          placeholder="What shows on the resume"
+        />
+        {/* Valid/invalid glyph on the right — auto-href still runs under
+            the hood; we just keep the visual footprint clean and rely on
+            the inline icon to signal state. */}
+        {contact.value.trim() && !validationMsg && kind !== "text" && (
+          <Check
+            className="pointer-events-none absolute right-2 h-3.5 w-3.5 text-[oklch(0.58_0.14_150)]"
+            aria-hidden
+          />
+        )}
+        {validationMsg && (
+          <AlertCircle
+            className="pointer-events-none absolute right-2 h-3.5 w-3.5 text-ink-danger"
+            aria-hidden
+          />
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={onRemove}
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
+        aria-label={`Remove ${contact.label || "contact"}`}
+      >
+        <Trash2 className="h-3.5 w-3.5" aria-hidden />
+      </button>
     </div>
   );
 }

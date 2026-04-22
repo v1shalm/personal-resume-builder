@@ -17,7 +17,7 @@ const tabs: { id: "header" | SectionKind; label: string }[] = [
   { id: "experience", label: "Experience" },
   { id: "skills", label: "Skills" },
   { id: "education", label: "Education" },
-  { id: "links", label: "Online" },
+  { id: "links", label: "Links" },
 ];
 
 export function EditorPanel() {
@@ -46,7 +46,7 @@ export function EditorPanel() {
       <nav
         role="tablist"
         aria-label="Resume sections"
-        className="relative flex shrink-0 items-stretch border-b border-ink-border bg-tabs px-1 shadow-[inset_0_1px_0_var(--shadow-highlight),0_1px_0_var(--shadow-edge-dark)]"
+        className="relative flex shrink-0 items-stretch overflow-x-auto border-b border-ink-border bg-tabs px-1 shadow-[inset_0_1px_0_var(--shadow-highlight),0_1px_0_var(--shadow-edge-dark)]"
       >
         {tabs.map((t) => {
           const isActive = activeTab === t.id;
@@ -64,7 +64,7 @@ export function EditorPanel() {
                 )
               }
               className={cn(
-                "relative flex-1 px-3 py-3.5 text-[12.5px] font-medium transition-colors duration-150",
+                "relative flex-1 whitespace-nowrap px-2.5 py-3.5 text-[12.5px] font-medium transition-colors duration-150 sm:px-3",
                 "hover:text-ink-text",
                 isActive ? "text-ink-text" : "text-ink-muted",
               )}
@@ -95,7 +95,7 @@ export function EditorPanel() {
             initial="hidden"
             animate="show"
             exit="exit"
-            className="px-5 py-6"
+            className="px-4 py-5 sm:px-5 sm:py-6"
           >
             {activeTab === "header" && <HeaderEditor />}
             {activeTab === "experience" && <ExperienceEditor />}

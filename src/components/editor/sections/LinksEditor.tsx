@@ -19,7 +19,7 @@ export function LinksEditor() {
       {items.length === 0 ? (
         <EmptyState
           label="No links yet."
-          hint="Dribbble, Behance, LinkedIn, personal site."
+          hint="Your portfolio, LinkedIn, Dribbble — whatever you want recruiters to see."
         />
       ) : (
         <SortableList
@@ -33,19 +33,19 @@ export function LinksEditor() {
                 className="h-8 w-32 shrink-0 border-transparent bg-transparent text-[13.5px] font-medium shadow-none hover:border-ink-border focus:shadow-none"
                 value={l.label}
                 onChange={(e) => update(l.id, { label: e.target.value })}
-                placeholder="Label"
+                placeholder="e.g. LinkedIn"
               />
               <Input
                 aria-label="URL"
                 className="h-8 flex-1 border-transparent bg-transparent text-[12.5px] text-ink-muted shadow-none hover:border-ink-border focus:shadow-none"
                 value={l.url}
                 onChange={(e) => update(l.id, { url: e.target.value })}
-                placeholder="https://"
+                placeholder="https://linkedin.com/in/…"
               />
               <button
                 type="button"
                 onClick={() => remove(l.id)}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-surface hover:text-ink-danger"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                 aria-label={`Remove ${l.label || "link"}`}
               >
                 <Trash2 className="h-3.5 w-3.5" aria-hidden />

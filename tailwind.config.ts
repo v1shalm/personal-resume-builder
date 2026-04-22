@@ -28,6 +28,8 @@ const config: Config = {
           accentBot: "oklch(0.815 0.172 82)",
           accentText: "var(--ink-accent-text)",
           danger: "var(--ink-danger)",
+          hover: "var(--ink-hover)",
+          hoverDanger: "var(--ink-hover-danger)",
         },
         // Resume paper — fixed light across themes (this is the document)
         paper: {
