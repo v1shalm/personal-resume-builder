@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useResumeStore } from "@/lib/store";
 import type { SectionKind } from "@/lib/types";
@@ -25,6 +26,7 @@ export function EditorPanel() {
   const selection = useResumeStore((s) => s.selection);
   const select = useResumeStore((s) => s.select);
   const play = useSfx();
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const activeTab: "header" | SectionKind =
     selection.kind === "header"
@@ -39,6 +41,32 @@ export function EditorPanel() {
               ? "education"
               : "links";
 
+  const activateTab = (id: (typeof tabs)[number]["id"]) => {
+    if (activeTab !== id) play("tabSwap");
+    select(
+      id === "header"
+        ? { kind: "header" }
+        : { kind: "section", id: id as SectionKind },
+    );
+  };
+
+  // WAI-ARIA tab pattern: ArrowLeft/ArrowRight cycles tabs, Home/End
+  // jumps to first/last. Focus AND selection move together — Radix-
+  // style automatic activation, which feels snappier for this editor
+  // where tab content renders cheaply.
+  const onTabKeyDown = (e: React.KeyboardEvent, idx: number) => {
+    const count = tabs.length;
+    let next = idx;
+    if (e.key === "ArrowRight") next = (idx + 1) % count;
+    else if (e.key === "ArrowLeft") next = (idx - 1 + count) % count;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = count - 1;
+    else return;
+    e.preventDefault();
+    activateTab(tabs[next].id);
+    tabRefs.current[next]?.focus();
+  };
+
   return (
     <div className="relative flex min-w-0 flex-col overflow-hidden border-l border-ink-border bg-panel shadow-panel-t">
       <div
@@ -50,24 +78,22 @@ export function EditorPanel() {
         aria-label="Resume sections"
         className="relative flex shrink-0 items-stretch overflow-x-auto border-b border-ink-border bg-tabs px-1 shadow-[inset_0_1px_0_var(--shadow-highlight),0_1px_0_var(--shadow-edge-dark)]"
       >
-        {tabs.map((t) => {
+        {tabs.map((t, idx) => {
           const isActive = activeTab === t.id;
           return (
             <button
               key={t.id}
+              ref={(el) => {
+                tabRefs.current[idx] = el;
+              }}
               role="tab"
               aria-selected={isActive}
               aria-controls="editor-panel-content"
-              onClick={() => {
-                if (activeTab !== t.id) play("tabSwap");
-                select(
-                  t.id === "header"
-                    ? { kind: "header" }
-                    : { kind: "section", id: t.id as SectionKind },
-                );
-              }}
+              tabIndex={isActive ? 0 : -1}
+              onClick={() => activateTab(t.id)}
+              onKeyDown={(e) => onTabKeyDown(e, idx)}
               className={cn(
-                "relative flex-1 whitespace-nowrap px-2.5 py-3.5 text-[12.5px] font-medium transition-colors duration-150 sm:px-3",
+                "relative flex-1 whitespace-nowrap px-2.5 py-3.5 text-[12.5px] font-medium transition-colors duration-fast sm:px-3",
                 "hover:text-ink-text",
                 isActive ? "text-ink-text" : "text-ink-muted",
               )}

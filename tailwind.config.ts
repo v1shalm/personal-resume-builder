@@ -57,6 +57,26 @@ const config: Config = {
         "grid-sm": "20px 20px",
         "grid-md": "24px 24px",
       },
+      // Motion grammar — a tiny, named vocabulary used across the app.
+      //
+      //   duration-fast  (140ms)  → micro-interactions, hover/press
+      //   duration-base  (180ms)  → standard color/transform transitions
+      //   duration-slow  (240ms)  → entrance/exit and layered reveals
+      //
+      //   ease-out-quart          → natural deceleration, snappy decel
+      //   ease-out-expo           → stronger decel, feels "pulled in"
+      //   ease-soft               → the 0.22/1/0.36/1 curve used for
+      //                              overlays, radix primitives
+      transitionDuration: {
+        fast: "140ms",
+        base: "180ms",
+        slow: "240ms",
+      },
+      transitionTimingFunction: {
+        "out-quart": "cubic-bezier(0.25, 1, 0.5, 1)",
+        "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
+        soft: "cubic-bezier(0.22, 1, 0.36, 1)",
+      },
       keyframes: {
         "fade-in": {
           from: { opacity: "0", transform: "translateY(2px)" },

@@ -51,6 +51,43 @@ export function SortableList<T extends { id: string }>({
     onReorder(String(active.id), String(over.id));
   };
 
+  // Position-based SR announcements. The generic list can't know a
+  // human label for each item, so we describe moves by position only
+  // ("Item moved from position 2 to 4 of 5") — clear, universal, and
+  // avoids leaking opaque ID strings to assistive tech.
+  const positionOf = (id: string | number) =>
+    items.findIndex((i) => i.id === String(id)) + 1;
+  const total = items.length;
+
+  const announcements = {
+    onDragStart({ active }: { active: { id: string | number } }) {
+      return `Picked up item at position ${positionOf(active.id)} of ${total}.`;
+    },
+    onDragOver({
+      active,
+      over,
+    }: {
+      active: { id: string | number };
+      over: { id: string | number } | null;
+    }) {
+      if (!over) return `Item at position ${positionOf(active.id)} is no longer over a droppable area.`;
+      return `Item moved to position ${positionOf(over.id)} of ${total}.`;
+    },
+    onDragEnd({
+      active,
+      over,
+    }: {
+      active: { id: string | number };
+      over: { id: string | number } | null;
+    }) {
+      if (!over) return `Item dropped. It returned to position ${positionOf(active.id)}.`;
+      return `Item dropped at position ${positionOf(over.id)} of ${total}.`;
+    },
+    onDragCancel({ active }: { active: { id: string | number } }) {
+      return `Reorder cancelled. Item returned to position ${positionOf(active.id)}.`;
+    },
+  };
+
   void arrayMove;
 
   return (
@@ -59,6 +96,7 @@ export function SortableList<T extends { id: string }>({
       collisionDetection={closestCenter}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
+      accessibility={{ announcements }}
     >
       <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>
         <div className="flex flex-col gap-2">

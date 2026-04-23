@@ -73,10 +73,19 @@ export function PreviewPane() {
             so a Framer `layout` animation can't see it and only ends up
             re-measuring the huge preview subtree on every state change.
             Plain div is materially cheaper.
+
+            `contain: layout paint style` seals the preview subtree as a
+            containment boundary — the browser is told that nothing
+            inside affects anything outside (and vice versa), so edits in
+            the editor pane don't invalidate paint work on the preview's
+            ancestors. Noticeable on slow devices.
           */}
           <div
-            className="origin-top shadow-paper-t transition-transform duration-[180ms] ease-out"
-            style={{ transform: `scale(${zoom})` }}
+            className="origin-top shadow-paper-t transition-transform duration-base ease-out-quart"
+            style={{
+              transform: `scale(${zoom})`,
+              contain: "layout paint style",
+            }}
           >
             <ResumePreview resume={resume} />
           </div>

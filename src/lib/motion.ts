@@ -54,20 +54,22 @@ export const rowFadeUp: Variants = {
   },
 };
 
-// Tab content swap (Emil-style cross-fade with tiny y).
+// Tab content swap. Blur was removed from here because the tab panel
+// can be a huge subtree (Experience with many role cards), and the
+// temporary GPU layer required to blur it can cost a frame on lower-end
+// hardware. Blur stays as a signature on *small* surfaces (dialogs,
+// toolbar number flips, etc.) where it's effectively free.
 export const tabSwap: Variants = {
-  hidden: { opacity: 0, y: 4, filter: "blur(4px)" },
+  hidden: { opacity: 0, y: 4 },
   show: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
-    transition: { ...spring.soft, filter: { duration: 0.22 } },
+    transition: spring.soft,
   },
   exit: {
     opacity: 0,
     y: -4,
-    filter: "blur(4px)",
-    transition: { duration: 0.14 },
+    transition: { duration: 0.14, ease: [0.4, 0, 1, 1] as const },
   },
 };
 

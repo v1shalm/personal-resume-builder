@@ -79,7 +79,7 @@ export function ColorPicker({ value, onChange, ...rest }: Props) {
                   whileHover={{ y: -1, scale: 1.04 }}
                   whileTap={{ scale: 0.92, y: 0.5 }}
                   transition={spring.press}
-                  className="rounded-[9px] focus-visible:outline-offset-3"
+                  className="rounded-[9px] focus-visible:outline-offset-[3px]"
                 >
                   <Swatch hex={p.hex} active={isActive} />
                 </motion.button>

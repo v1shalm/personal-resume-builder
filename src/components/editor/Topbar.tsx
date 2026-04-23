@@ -31,10 +31,11 @@ import {
 import { spring, stagger, rowFadeUp } from "@/lib/motion";
 
 export function Topbar() {
+  // Only the header name drives this bar's render. Everything else
+  // (reset/importResume/resume-for-JSON-export) is read via `getState()`
+  // inside the callbacks, so typing a bullet in the editor doesn't
+  // re-render the whole topbar on every keystroke.
   const name = useResumeStore((s) => s.resume.header.name);
-  const reset = useResumeStore((s) => s.reset);
-  const resume = useResumeStore((s) => s.resume);
-  const importResume = useResumeStore((s) => s.importResume);
   const theme = useTheme((s) => s.theme);
   const swapTheme = useThemeSwap();
   const soundEnabled = useSoundSettings((s) => s.enabled);
@@ -65,6 +66,7 @@ export function Topbar() {
   }, [prefetchExport]);
 
   const downloadJSON = () => {
+    const resume = useResumeStore.getState().resume;
     const blob = new Blob([JSON.stringify(resume, null, 2)], {
       type: "application/json",
     });
@@ -87,7 +89,7 @@ export function Topbar() {
       reader.onload = () => {
         try {
           const data = JSON.parse(String(reader.result));
-          importResume(data);
+          useResumeStore.getState().importResume(data);
         } catch {
           alert("Couldn't read that file. Make sure it's a JSON saved from this builder.");
         }
@@ -103,7 +105,7 @@ export function Topbar() {
         "Reset to the starter resume?\n\nYour current edits will be replaced and can't be recovered. Save a JSON backup first if you want to keep them.",
       )
     ) {
-      reset();
+      useResumeStore.getState().reset();
     }
   };
 

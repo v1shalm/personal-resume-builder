@@ -162,7 +162,7 @@ export function SectionHeader({
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-baseline gap-2.5">
-        <span className="text-[11.5px] font-medium uppercase tracking-[0.08em] text-ink-muted">
+        <span className="text-[11.5px] font-medium uppercase tracking-[0.08em] text-ink-muted tabular-nums">
           {count === 1 ? "1 item" : `${count} items`}
         </span>
       </div>

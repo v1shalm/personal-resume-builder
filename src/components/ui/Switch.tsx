@@ -20,7 +20,7 @@ export const Switch = React.forwardRef<
       onCheckedChange={handleChange}
       className={cn(
         // Off state — recessed well
-        "peer relative inline-flex h-[22px] w-[38px] shrink-0 cursor-pointer items-center rounded-full border border-ink-border bg-input transition-colors duration-200",
+        "peer relative inline-flex h-[22px] w-[38px] shrink-0 cursor-pointer items-center rounded-full border border-ink-border bg-input transition-colors duration-base",
         "shadow-[inset_0_1px_2px_var(--shadow-drop-mid),inset_0_-1px_0_var(--shadow-highlight)]",
         // On state — yellow CTA: same 3-stop gradient, inset top highlight, hairline ring, outer drop shadow
         "data-[state=checked]:border-[oklch(0.55_0.12_75_/_0.55)]",
@@ -33,7 +33,7 @@ export const Switch = React.forwardRef<
     >
       <SwitchPrimitive.Thumb
         className={cn(
-          "pointer-events-none relative block h-[16px] w-[16px] rounded-full transition-transform duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]",
+          "pointer-events-none relative block h-[16px] w-[16px] rounded-full transition-transform duration-base ease-soft",
           // Thumb off — light graphite orb, inset highlight + outer drop shadow
           "translate-x-[3px]",
           "bg-[linear-gradient(180deg,oklch(0.88_0.005_250)_0%,oklch(0.74_0.005_250)_100%)]",
