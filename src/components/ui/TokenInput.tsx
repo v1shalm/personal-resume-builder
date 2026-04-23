@@ -121,7 +121,7 @@ export function TokenInput({
     <div className="relative flex flex-col gap-2">
       <div
         className={cn(
-          "flex min-h-[44px] flex-wrap items-center gap-1.5 rounded-lg border border-[var(--input-border)] bg-input px-2 py-1.5 shadow-well-t transition-[border-color,box-shadow] duration-150",
+          "flex min-h-[44px] flex-wrap items-center gap-1.5 rounded-lg border border-[var(--input-border)] bg-input px-2 py-1.5 shadow-well-t transition-[border-color,box-shadow] duration-fast",
           "hover:border-ink-borderStrong",
           focused &&
             "border-[var(--input-focus-border)] shadow-[inset_0_1.5px_2px_var(--input-shadow-top),0_0_0_3px_var(--input-focus-ring)]",

@@ -68,7 +68,7 @@ export function FontSelect({ value, onChange, ...rest }: Props) {
         aria-label={rest["aria-label"]}
         className={cn(
           "flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-ink-border bg-card px-3 text-left text-[13px] text-ink-text shadow-raised-t",
-          "transition-colors duration-150 hover:border-ink-borderStrong",
+          "transition-colors duration-fast hover:border-ink-borderStrong",
           "focus:outline-none data-[state=open]:border-ink-borderStrong",
         )}
       >

@@ -110,7 +110,7 @@ export const Slider = React.forwardRef<
           //   amber hairline outer  — contact with the yellow fill
           //   drop shadows          — lift above the track
           "shadow-[inset_0_1px_0_oklch(1_0_0_/_0.9),inset_0_0_0_2px_oklch(1_0_0_/_0.55),inset_0_-1.5px_0_oklch(0.7_0.01_85_/_0.3),0_0_0_1px_oklch(0.4_0.08_75_/_0.55),0_1.5px_3px_oklch(0_0_0_/_0.5),0_2px_6px_-2px_oklch(0_0_0_/_0.35)]",
-          "transition-transform duration-150",
+          "transition-transform duration-fast",
           "hover:scale-[1.08]",
           "focus-visible:outline-none focus-visible:shadow-[inset_0_1px_0_oklch(1_0_0_/_0.9),inset_0_0_0_2px_oklch(1_0_0_/_0.55),inset_0_-1.5px_0_oklch(0.7_0.01_85_/_0.3),0_0_0_1px_oklch(0.4_0.08_75_/_0.65),0_0_0_4px_oklch(0.855_0.165_85_/_0.3),0_1.5px_3px_oklch(0_0_0_/_0.5)]",
           "active:scale-95",

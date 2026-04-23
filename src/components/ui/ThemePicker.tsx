@@ -39,7 +39,7 @@ export function ThemePicker({ value, onChange, ...rest }: Props) {
             }}
             className={cn(
               "group flex flex-col items-stretch gap-0 overflow-hidden rounded-[10px]",
-              "transition-[box-shadow] duration-150",
+              "transition-[box-shadow] duration-fast",
               isActive
                 ? "shadow-[0_0_0_2px_oklch(0.855_0.165_85),0_0_0_3.5px_var(--ink-bg),0_0_12px_-2px_oklch(0.855_0.165_85_/_0.45)]"
                 : "shadow-none",

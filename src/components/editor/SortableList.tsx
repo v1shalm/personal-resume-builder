@@ -161,7 +161,7 @@ export function DragHandle({
       transition={{ type: "spring", stiffness: 500, damping: 26, mass: 0.5 }}
       className={cn(
         // Touch-friendly hit area (40×40 on mobile) with smaller painted chrome
-        "flex h-10 w-10 shrink-0 cursor-grab items-center justify-center rounded-md text-ink-muted/60 transition-colors duration-150 hover:bg-ink-hover hover:text-ink-text active:cursor-grabbing sm:h-8 sm:w-7",
+        "flex h-11 w-11 shrink-0 cursor-grab items-center justify-center rounded-md text-ink-muted/60 transition-colors duration-fast hover:bg-ink-hover hover:text-ink-text active:cursor-grabbing sm:h-8 sm:w-7",
         className,
       )}
       {...dragAttrs}

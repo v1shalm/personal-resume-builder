@@ -195,7 +195,7 @@ function TargetPills({
               onChange(t.id);
             }}
             className={cn(
-              "relative z-10 flex-1 rounded-md px-2 py-[5px] text-[11.5px] font-medium transition-colors duration-200",
+              "relative z-10 flex-1 rounded-md px-2 py-[5px] text-[11.5px] font-medium transition-colors duration-base",
               isActive ? "text-ink-text" : "text-ink-muted hover:text-ink-text",
             )}
           >

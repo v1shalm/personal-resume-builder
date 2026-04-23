@@ -196,7 +196,7 @@ function ContactRow({
           play("remove");
           onRemove();
         }}
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-fast hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
         aria-label={`Remove ${contact.label || "contact"}`}
       >
         <Trash2 className="h-3.5 w-3.5" aria-hidden />

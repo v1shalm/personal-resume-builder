@@ -1,7 +1,29 @@
 import type { Transition, Variants } from "motion/react";
 
-// Shared spring vocabulary. Keep these sparse so the whole UI speaks in one
-// grammar. Emil/Jakub-style: springs everywhere, small amplitudes, brief blur.
+// Shared motion vocabulary. Keep these sparse so the whole UI speaks in one
+// grammar. Springs for interactive state changes, durations for entrance/
+// exit curves that need to finish at a predictable time.
+//
+// These mirror the Tailwind tokens in tailwind.config.ts:
+//   duration-fast (140ms) → DURATION.fast
+//   duration-base (180ms) → DURATION.base
+//   duration-slow (240ms) → DURATION.slow
+// Keep them in lockstep — if you change one, change the other.
+export const DURATION = {
+  fast: 0.14,
+  base: 0.18,
+  slow: 0.24,
+} as const;
+
+// Canonical ease curves that match the Tailwind ease-* tokens.
+export const EASE = {
+  outQuart: [0.25, 1, 0.5, 1] as const,
+  outExpo: [0.16, 1, 0.3, 1] as const,
+  soft: [0.22, 1, 0.36, 1] as const,
+  // For exits: a gentle in-quad. Objects falling toward their destination.
+  inOut: [0.4, 0, 0.2, 1] as const,
+  inQuad: [0.4, 0, 1, 1] as const,
+};
 
 export const spring = {
   // Default snappy UI spring. Most interactions use this.
@@ -28,7 +50,7 @@ export const fadeInBlur: Variants = {
     opacity: 0,
     y: -4,
     filter: "blur(4px)",
-    transition: { duration: 0.16, ease: [0.4, 0, 0.2, 1] as const },
+    transition: { duration: DURATION.base, ease: EASE.inOut },
   },
 };
 
@@ -50,7 +72,7 @@ export const rowFadeUp: Variants = {
   exit: {
     opacity: 0,
     y: -4,
-    transition: { duration: 0.14, ease: [0.4, 0, 1, 1] as const },
+    transition: { duration: DURATION.fast, ease: EASE.inQuad },
   },
 };
 
@@ -69,7 +91,7 @@ export const tabSwap: Variants = {
   exit: {
     opacity: 0,
     y: -4,
-    transition: { duration: 0.14, ease: [0.4, 0, 1, 1] as const },
+    transition: { duration: DURATION.fast, ease: EASE.inQuad },
   },
 };
 
@@ -99,6 +121,6 @@ export const dialogEnter: Variants = {
     x: "-50%",
     y: "calc(-50% + 4px)",
     filter: "blur(6px)",
-    transition: { duration: 0.18, ease: [0.4, 0, 0.2, 1] as const },
+    transition: { duration: DURATION.base, ease: EASE.inOut },
   },
 };

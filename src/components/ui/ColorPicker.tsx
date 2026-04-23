@@ -42,7 +42,7 @@ export function ColorPicker({ value, onChange, ...rest }: Props) {
         aria-label={rest["aria-label"]}
         className={cn(
           "flex h-10 w-full items-center justify-between gap-3 rounded-lg border border-ink-border bg-card px-3 text-left text-[13px] text-ink-text shadow-raised-t",
-          "transition-colors duration-150 hover:border-ink-borderStrong",
+          "transition-colors duration-fast hover:border-ink-borderStrong",
           "focus:outline-none data-[state=open]:border-ink-borderStrong",
         )}
       >
@@ -116,7 +116,7 @@ export function ColorPicker({ value, onChange, ...rest }: Props) {
               }}
               className={cn(
                 "h-9 flex-1 rounded-lg border border-[var(--input-border)] bg-input px-3 text-[13px] tabular-nums text-ink-text shadow-well-t",
-                "transition-[border-color,box-shadow] duration-150 hover:border-ink-borderStrong",
+                "transition-[border-color,box-shadow] duration-fast hover:border-ink-borderStrong",
                 "focus:border-[var(--input-focus-border)] focus:shadow-[inset_0_1.5px_2px_var(--input-shadow-top),0_0_0_3px_var(--input-focus-ring)] focus:outline-none",
               )}
               placeholder="#000000"

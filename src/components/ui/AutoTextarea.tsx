@@ -40,7 +40,7 @@ export const AutoTextarea = React.forwardRef<HTMLTextAreaElement, Props>(
         className={cn(
           "flex w-full rounded-lg border border-[var(--input-border)] bg-input px-3 py-2.5 text-[13.5px] leading-[1.6] text-ink-text shadow-well-t",
           "placeholder:text-ink-subtle",
-          "transition-[border-color,box-shadow] duration-150",
+          "transition-[border-color,box-shadow] duration-fast",
           "hover:border-ink-borderStrong",
           "focus:border-[var(--input-focus-border)] focus:shadow-[inset_0_1.5px_2px_var(--input-shadow-top),0_0_0_3px_var(--input-focus-ring)] focus:outline-none",
           "resize-none overflow-hidden",

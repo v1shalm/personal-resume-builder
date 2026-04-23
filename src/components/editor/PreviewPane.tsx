@@ -156,7 +156,7 @@ export function PreviewPane() {
           aria-pressed={fitMode}
           aria-label="Fit to window"
           className={cn(
-            "flex h-8 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-semibold transition-colors duration-150",
+            "flex h-8 items-center gap-1.5 rounded-full px-3.5 text-[12px] font-semibold transition-colors duration-fast",
             fitMode
               ? [
                   "text-ink-text bg-card",
@@ -191,7 +191,7 @@ function ToolbarIconButton({
       whileTap={disabled ? undefined : { scale: 0.9 }}
       transition={spring.press}
       aria-label={label}
-      className="flex h-8 w-8 items-center justify-center rounded-full text-ink-muted transition-colors duration-150 hover:bg-ink-hover hover:text-ink-text disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-ink-muted"
+      className="flex h-8 w-8 items-center justify-center rounded-full text-ink-muted transition-colors duration-fast hover:bg-ink-hover hover:text-ink-text disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-ink-muted"
     >
       {children}
     </motion.button>

@@ -29,7 +29,7 @@ export function SectionArranger() {
         }}
         aria-expanded={open}
         aria-controls="section-arranger-body"
-        className="flex w-full items-center justify-between px-5 py-3 text-left transition-colors duration-150 hover:bg-ink-hover"
+        className="flex w-full items-center justify-between px-5 py-3 text-left transition-colors duration-fast hover:bg-ink-hover"
       >
         <div className="flex flex-col items-start gap-0.5">
           <span className="text-[12.5px] font-medium text-ink-text">
@@ -86,7 +86,7 @@ export function SectionArranger() {
                         toggle(item.id);
                       }}
                       className={cn(
-                        "flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-150",
+                        "flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-fast",
                         item.visible
                           ? "text-ink-muted hover:bg-ink-hover hover:text-ink-text"
                           : "text-ink-danger hover:bg-ink-hoverDanger",

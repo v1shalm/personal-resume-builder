@@ -42,7 +42,7 @@ export function WeightPicker({ value, onChange, ...rest }: Props) {
               onChange(w.value);
             }}
             className={cn(
-              "relative z-10 flex-1 rounded-md px-2 py-[5px] text-[11.5px] transition-colors duration-200",
+              "relative z-10 flex-1 rounded-md px-2 py-[5px] text-[11.5px] transition-colors duration-base",
               isActive ? "text-ink-text" : "text-ink-muted hover:text-ink-text",
             )}
             style={{ fontWeight: w.value }}

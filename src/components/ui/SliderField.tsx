@@ -46,7 +46,7 @@ export function SliderField({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 transition-opacity duration-200",
+        "flex items-center gap-3 transition-opacity duration-base",
         disabled && "pointer-events-none opacity-40",
       )}
       aria-disabled={disabled}
@@ -66,7 +66,7 @@ export function SliderField({
         className={cn(
           "relative flex h-8 w-[74px] shrink-0 items-center rounded-md border border-[var(--input-border)] bg-input px-2 shadow-well-t",
           "focus-within:border-[var(--input-focus-border)] focus-within:shadow-[inset_0_1.5px_2px_var(--input-shadow-top),0_0_0_2.5px_var(--input-focus-ring)]",
-          "transition-[border-color,box-shadow] duration-150",
+          "transition-[border-color,box-shadow] duration-fast",
         )}
       >
         <input
