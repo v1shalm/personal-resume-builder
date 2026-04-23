@@ -6,6 +6,7 @@ import { motion } from "motion/react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { spring } from "@/lib/motion";
+import { useSfx } from "@/lib/useSfx";
 
 const PRESETS = [
   { id: "navy", hex: "#23316d", label: "Navy" },
@@ -31,11 +32,12 @@ type Props = {
 export function ColorPicker({ value, onChange, ...rest }: Props) {
   const [draft, setDraft] = React.useState(value);
   React.useEffect(() => setDraft(value), [value]);
+  const play = useSfx();
 
   const isValidHex = (s: string) => /^#[0-9a-fA-F]{6}$/.test(s);
 
   return (
-    <DropdownMenu.Root>
+    <DropdownMenu.Root onOpenChange={(o) => play(o ? "dropdownOpen" : "dropdownClose")}>
       <DropdownMenu.Trigger
         aria-label={rest["aria-label"]}
         className={cn(
@@ -70,7 +72,10 @@ export function ColorPicker({ value, onChange, ...rest }: Props) {
                   type="button"
                   aria-label={p.label}
                   aria-pressed={isActive}
-                  onClick={() => onChange(p.hex)}
+                  onClick={() => {
+                    if (!isActive) play("select");
+                    onChange(p.hex);
+                  }}
                   whileHover={{ y: -1, scale: 1.04 }}
                   whileTap={{ scale: 0.92, y: 0.5 }}
                   transition={spring.press}

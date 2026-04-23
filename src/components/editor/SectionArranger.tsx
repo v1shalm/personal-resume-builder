@@ -8,6 +8,7 @@ import { SortableList, DragHandle } from "./SortableList";
 import { ChevronDown, Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { spring } from "@/lib/motion";
+import { useSfx } from "@/lib/useSfx";
 
 export function SectionArranger() {
   const order = useResumeStore((s) => s.resume.sectionOrder);
@@ -17,11 +18,15 @@ export function SectionArranger() {
 
   const [open, setOpen] = useState(false);
   const items = order.map((id) => sections[id]);
+  const play = useSfx();
 
   return (
     <div className="shrink-0 border-t border-ink-border bg-arranger shadow-[inset_0_1px_0_var(--shadow-highlight),inset_0_-1px_0_var(--shadow-edge-dark)]">
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          play(open ? "close" : "open");
+          setOpen((o) => !o);
+        }}
         aria-expanded={open}
         aria-controls="section-arranger-body"
         className="flex w-full items-center justify-between px-5 py-3 text-left transition-colors duration-150 hover:bg-ink-hover"
@@ -76,7 +81,10 @@ export function SectionArranger() {
                       type="button"
                       whileTap={{ scale: 0.9 }}
                       transition={spring.press}
-                      onClick={() => toggle(item.id)}
+                      onClick={() => {
+                        play(item.visible ? "toggleOff" : "toggleOn");
+                        toggle(item.id);
+                      }}
                       className={cn(
                         "flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-150",
                         item.visible

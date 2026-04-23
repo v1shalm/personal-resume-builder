@@ -3,6 +3,7 @@
 import * as React from "react";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 import { cn } from "@/lib/utils";
+import { useSfx } from "@/lib/useSfx";
 
 const TICK_COUNT = 11;
 // Thumb is smaller than the track so there's a clear "pocket" of pill color
@@ -22,10 +23,30 @@ type Props = React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>;
 export const Slider = React.forwardRef<
   React.ComponentRef<typeof SliderPrimitive.Root>,
   Props
->(({ className, value, defaultValue, min = 0, max = 100, ...props }, ref) => {
+>(({ className, value, defaultValue, min = 0, max = 100, onValueChange, onValueCommit, ...props }, ref) => {
   const raw = value ?? defaultValue ?? [min];
   const v = raw[0] ?? min;
   const pct = max === min ? 0 : ((v - min) / (max - min)) * 100;
+
+  const play = useSfx();
+  // Track the last value we ticked for so holding still is silent.
+  const lastTickedRef = React.useRef<number>(v);
+
+  const handleValueChange = (next: number[]) => {
+    const n = next[0];
+    if (n !== undefined && n !== lastTickedRef.current) {
+      lastTickedRef.current = n;
+      // ±80 cents of random detune keeps a fast drag from sounding like
+      // a single pitched drone. Cheap, effective.
+      play("sliderTick", { detune: (Math.random() - 0.5) * 160 });
+    }
+    onValueChange?.(next);
+  };
+
+  const handleValueCommit = (next: number[]) => {
+    play("tap");
+    onValueCommit?.(next);
+  };
 
   // Theme-aware via CSS vars; dots and base swap with light/dark mode.
   const DOTS_BG = `radial-gradient(circle at center, var(--slider-tick) 1.5px, transparent 2px)`;
@@ -38,6 +59,8 @@ export const Slider = React.forwardRef<
       defaultValue={defaultValue}
       min={min}
       max={max}
+      onValueChange={handleValueChange}
+      onValueCommit={handleValueCommit}
       className={cn(
         "relative flex h-8 w-full touch-none select-none items-center",
         className,

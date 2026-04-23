@@ -11,6 +11,7 @@ import { LinksEditor } from "./sections/LinksEditor";
 import { SectionArranger } from "./SectionArranger";
 import { cn } from "@/lib/utils";
 import { spring, tabSwap } from "@/lib/motion";
+import { useSfx } from "@/lib/useSfx";
 
 const tabs: { id: "header" | SectionKind; label: string }[] = [
   { id: "header", label: "Header" },
@@ -23,6 +24,7 @@ const tabs: { id: "header" | SectionKind; label: string }[] = [
 export function EditorPanel() {
   const selection = useResumeStore((s) => s.selection);
   const select = useResumeStore((s) => s.select);
+  const play = useSfx();
 
   const activeTab: "header" | SectionKind =
     selection.kind === "header"
@@ -56,13 +58,14 @@ export function EditorPanel() {
               role="tab"
               aria-selected={isActive}
               aria-controls="editor-panel-content"
-              onClick={() =>
+              onClick={() => {
+                if (activeTab !== t.id) play("tabSwap");
                 select(
                   t.id === "header"
                     ? { kind: "header" }
                     : { kind: "section", id: t.id as SectionKind },
-                )
-              }
+                );
+              }}
               className={cn(
                 "relative flex-1 whitespace-nowrap px-2.5 py-3.5 text-[12.5px] font-medium transition-colors duration-150 sm:px-3",
                 "hover:text-ink-text",

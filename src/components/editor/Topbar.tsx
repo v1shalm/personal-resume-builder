@@ -1,12 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion } from "motion/react";
 import { Button } from "@/components/ui/Button";
 import { useResumeStore } from "@/lib/store";
 import { useTheme } from "@/lib/theme";
-import { ExportDialog } from "./ExportDialog";
-import { Download, RotateCcw, FileJson, FileUp, Sun, Moon } from "lucide-react";
+import { useSoundSettings } from "@/lib/soundSettings";
+import { useSfx } from "@/lib/useSfx";
+import { useThemeSwap } from "@/lib/useThemeSwap";
+
+// `@react-pdf/renderer` is ~300 KB+ of PDF engine. Code-split the whole
+// ExportDialog (which transitively pulls it in) so visitors who never
+// export don't pay the cost. `loadExportDialog` is exposed so we can
+// prefetch the chunk on hover/focus of the Export button — dynamic()
+// caches the resolved module, so repeated calls are free.
+const loadExportDialog = () =>
+  import("./ExportDialog").then((m) => ({ default: m.ExportDialog }));
+const ExportDialog = dynamic(loadExportDialog, { ssr: false });
+import {
+  Download,
+  RotateCcw,
+  FileJson,
+  FileUp,
+  Sun,
+  Moon,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { spring, stagger, rowFadeUp } from "@/lib/motion";
 
 export function Topbar() {
@@ -15,20 +36,33 @@ export function Topbar() {
   const resume = useResumeStore((s) => s.resume);
   const importResume = useResumeStore((s) => s.importResume);
   const theme = useTheme((s) => s.theme);
-  const toggleTheme = useTheme((s) => s.toggle);
+  const swapTheme = useThemeSwap();
+  const soundEnabled = useSoundSettings((s) => s.enabled);
+  const toggleSound = useSoundSettings((s) => s.toggle);
+  const play = useSfx();
 
   const [exportOpen, setExportOpen] = useState(false);
+
+  // Prefetch the lazy ExportDialog chunk. Called on hover/focus of the
+  // Export button AND when the ⌘E shortcut is observed, so the dialog
+  // mount is instant in practice.
+  const prefetchExport = useCallback(() => {
+    void loadExportDialog();
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "e") {
         e.preventDefault();
+        // Kick the chunk load in parallel with the state flip so the
+        // dialog shows up as soon as the chunk arrives.
+        prefetchExport();
         setExportOpen(true);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [prefetchExport]);
 
   const downloadJSON = () => {
     const blob = new Blob([JSON.stringify(resume, null, 2)], {
@@ -142,7 +176,50 @@ export function Topbar() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={toggleTheme}
+            sound={false}
+            onClick={() => {
+              // Play the "off" cue *before* flipping so the user gets one
+              // last piece of audible feedback at the moment they mute.
+              // When flipping back on, the next interaction will be the
+              // confirmation — simpler than fighting the provider's
+              // re-render timing.
+              if (soundEnabled) play("toggleOff");
+              toggleSound();
+            }}
+            aria-label={soundEnabled ? "Mute interface sounds" : "Unmute interface sounds"}
+            aria-pressed={!soundEnabled}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {soundEnabled ? (
+                <motion.span
+                  key="volume-on"
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.7 }}
+                  transition={spring.snap}
+                  className="flex"
+                >
+                  <Volume2 className="h-3.5 w-3.5" aria-hidden />
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="volume-off"
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.7 }}
+                  transition={spring.snap}
+                  className="flex"
+                >
+                  <VolumeX className="h-3.5 w-3.5" aria-hidden />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            sound={false}
+            onClick={swapTheme}
             aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
           >
             <AnimatePresence mode="wait" initial={false}>
@@ -176,6 +253,8 @@ export function Topbar() {
             variant="primary"
             size="lg"
             onClick={() => setExportOpen(true)}
+            onMouseEnter={prefetchExport}
+            onFocus={prefetchExport}
             aria-label="Export PDF"
             className="px-3 sm:px-4"
           >
@@ -192,7 +271,16 @@ export function Topbar() {
           </Button>
         </motion.div>
       </motion.header>
-      <ExportDialog open={exportOpen} onOpenChange={setExportOpen} />
+      {/*
+        Only mount the dialog once it's actually been opened. Because
+        `ExportDialog` is a dynamic import, gating the JSX here is what
+        defers the chunk load until the user clicks Export (or presses
+        ⌘E). The hover/focus prefetch warms the chunk earlier, so by
+        the time this mounts the module is already cached.
+      */}
+      {exportOpen && (
+        <ExportDialog open={exportOpen} onOpenChange={setExportOpen} />
+      )}
     </>
   );
 }

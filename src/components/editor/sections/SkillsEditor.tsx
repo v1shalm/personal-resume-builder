@@ -7,6 +7,7 @@ import { SortableList, DragHandle } from "../SortableList";
 import { SectionHeader, EmptyState } from "./ExperienceEditor";
 import { Trash2 } from "lucide-react";
 import { SKILL_SUGGESTIONS } from "@/lib/skill-suggestions";
+import { useSfx } from "@/lib/useSfx";
 
 export function SkillsEditor() {
   const groups = useResumeStore((s) => s.resume.skillGroups);
@@ -14,6 +15,7 @@ export function SkillsEditor() {
   const update = useResumeStore((s) => s.updateSkillGroup);
   const remove = useResumeStore((s) => s.removeSkillGroup);
   const reorder = useResumeStore((s) => s.reorderSkillGroups);
+  const play = useSfx();
 
   return (
     <div className="flex flex-col gap-5">
@@ -45,8 +47,10 @@ export function SkillsEditor() {
                       confirm(
                         `Delete the ${g.label || "skill"} group?\n\nAll of its items will be removed. Can't be undone.`,
                       )
-                    )
+                    ) {
+                      play("remove");
                       remove(g.id);
+                    }
                   }}
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                   aria-label={`Remove ${g.label || "group"}`}

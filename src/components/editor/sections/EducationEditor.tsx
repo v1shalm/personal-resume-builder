@@ -6,6 +6,7 @@ import { SortableList, DragHandle } from "../SortableList";
 import { Field } from "./HeaderEditor";
 import { SectionHeader, EmptyState } from "./ExperienceEditor";
 import { Trash2 } from "lucide-react";
+import { useSfx } from "@/lib/useSfx";
 
 export function EducationEditor() {
   const items = useResumeStore((s) => s.resume.education);
@@ -13,6 +14,7 @@ export function EducationEditor() {
   const update = useResumeStore((s) => s.updateEducation);
   const remove = useResumeStore((s) => s.removeEducation);
   const reorder = useResumeStore((s) => s.reorderEducation);
+  const play = useSfx();
 
   return (
     <div className="flex flex-col gap-5">
@@ -44,8 +46,10 @@ export function EducationEditor() {
                       confirm(
                         `Delete ${ed.degree || "this entry"}?\n\nCan't be undone.`,
                       )
-                    )
+                    ) {
+                      play("remove");
                       remove(ed.id);
+                    }
                   }}
                   className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                   aria-label={`Remove ${ed.degree || "entry"}`}

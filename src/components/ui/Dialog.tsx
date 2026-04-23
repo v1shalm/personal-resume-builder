@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { dialogEnter } from "@/lib/motion";
+import { useSfx } from "@/lib/useSfx";
 
 type Ctx = { open: boolean };
 const DialogContext = React.createContext<Ctx>({ open: false });
@@ -34,6 +35,7 @@ export const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => {
   const { open } = React.useContext(DialogContext);
+  const play = useSfx();
   return (
     <AnimatePresence>
       {open && (
@@ -72,7 +74,10 @@ export const DialogContent = React.forwardRef<
               )}
             >
               {children}
-              <DialogPrimitive.Close className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-ink-hover hover:text-ink-text">
+              <DialogPrimitive.Close
+                onClick={() => play("modalClose")}
+                className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-ink-hover hover:text-ink-text"
+              >
                 <X className="h-3.5 w-3.5" aria-hidden />
                 <span className="sr-only">Close</span>
               </DialogPrimitive.Close>

@@ -48,12 +48,21 @@ export const metadata: Metadata = {
     description: SITE_DESC,
     siteName: "Resume Builder",
     locale: "en_US",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: SITE_TITLE,
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESC,
     creator: "@v1shalm",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -65,8 +74,8 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  // Next auto-registers src/app/icon.svg, src/app/apple-icon.tsx, and
-  // src/app/opengraph-image.tsx — no manual `icons` field needed.
+  // Next auto-registers src/app/icon.svg and src/app/apple-icon.tsx.
+  // The OG image is served as a static asset from /public/og-image.png.
 };
 
 export const viewport: Viewport = {
@@ -100,6 +109,16 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+        {/*
+          Preconnect to the font-preview hosts so the TLS handshake is
+          already done by the time the user opens the font dropdown or
+          swaps a theme font. Does nothing for visitors who never touch
+          fonts (connections time out cheaply).
+        */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://api.fontshare.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="anonymous" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}

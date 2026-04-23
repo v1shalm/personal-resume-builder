@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Topbar } from "./Topbar";
 import { PreviewPane } from "./PreviewPane";
 import { EditorPanel } from "./EditorPanel";
+import { SoundRoot } from "@/components/providers/SoundRoot";
 
 export function Editor() {
   const [mounted, setMounted] = useState(false);
@@ -23,19 +24,21 @@ export function Editor() {
   }
 
   return (
-    <div className="flex h-[100dvh] w-screen flex-col overflow-hidden bg-ink-bg text-ink-text">
-      <Topbar />
-      {/*
-        Layout breakpoints:
-        · Mobile  (<768px)  → single column, preview 52vh on top, editor below (scrollable).
-        · Tablet  (md)      → two columns, editor 340px.
-        · Laptop  (lg)      → editor 400px.
-        · Desktop (xl+)     → editor 440px (default).
-      */}
-      <div className="grid flex-1 overflow-hidden grid-cols-1 grid-rows-[minmax(0,52vh)_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_340px] md:grid-rows-1 lg:grid-cols-[minmax(0,1fr)_400px] xl:grid-cols-[minmax(0,1fr)_440px]">
-        <PreviewPane />
-        <EditorPanel />
+    <SoundRoot>
+      <div className="flex h-[100dvh] w-screen flex-col overflow-hidden bg-ink-bg text-ink-text">
+        <Topbar />
+        {/*
+          Layout breakpoints:
+          · Mobile  (<768px)  → single column, preview 52vh on top, editor below (scrollable).
+          · Tablet  (md)      → two columns, editor 340px.
+          · Laptop  (lg)      → editor 400px.
+          · Desktop (xl+)     → editor 440px (default).
+        */}
+        <div className="grid flex-1 overflow-hidden grid-cols-1 grid-rows-[minmax(0,52vh)_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_340px] md:grid-rows-1 lg:grid-cols-[minmax(0,1fr)_400px] xl:grid-cols-[minmax(0,1fr)_440px]">
+          <PreviewPane />
+          <EditorPanel />
+        </div>
       </div>
-    </div>
+    </SoundRoot>
   );
 }

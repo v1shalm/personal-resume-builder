@@ -10,6 +10,7 @@ import { WeightPicker } from "@/components/ui/WeightPicker";
 import { Field } from "./HeaderEditor";
 import { cn } from "@/lib/utils";
 import { spring } from "@/lib/motion";
+import { useSfx } from "@/lib/useSfx";
 
 type Target = "name" | "section" | "subtitle" | "body";
 
@@ -171,6 +172,7 @@ function TargetPills({
   value: Target;
   onChange: (t: Target) => void;
 }) {
+  const play = useSfx();
   return (
     <div
       role="radiogroup"
@@ -188,7 +190,10 @@ function TargetPills({
             role="radio"
             aria-checked={isActive}
             type="button"
-            onClick={() => onChange(t.id)}
+            onClick={() => {
+              if (!isActive) play("select");
+              onChange(t.id);
+            }}
             className={cn(
               "relative z-10 flex-1 rounded-md px-2 py-[5px] text-[11.5px] font-medium transition-colors duration-200",
               isActive ? "text-ink-text" : "text-ink-muted hover:text-ink-text",

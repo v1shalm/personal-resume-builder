@@ -7,3 +7,6 @@ next-env.d.ts.bak
 .DS_Store
 
 .vercel
+
+# Claude Code local settings (per-machine)
+.claude/

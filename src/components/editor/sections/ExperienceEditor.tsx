@@ -7,6 +7,7 @@ import { AutoTextarea } from "@/components/ui/AutoTextarea";
 import { SortableList, DragHandle } from "../SortableList";
 import { Field } from "./HeaderEditor";
 import { Plus, Trash2 } from "lucide-react";
+import { useSfx } from "@/lib/useSfx";
 
 export function ExperienceEditor() {
   const items = useResumeStore((s) => s.resume.experience);
@@ -18,6 +19,7 @@ export function ExperienceEditor() {
   const updateBullet = useResumeStore((s) => s.updateBullet);
   const removeBullet = useResumeStore((s) => s.removeBullet);
   const reorderBullets = useResumeStore((s) => s.reorderBullets);
+  const play = useSfx();
 
   return (
     <div className="flex flex-col gap-5">
@@ -56,6 +58,7 @@ export function ExperienceEditor() {
                         `Delete ${label}?\n\nAll of its bullets will be removed too. Can't be undone.`,
                       )
                     ) {
+                      play("remove");
                       removeExperience(exp.id);
                     }
                   }}
@@ -100,6 +103,7 @@ export function ExperienceEditor() {
                     <Button
                       variant="ghost"
                       size="sm"
+                      sound="add"
                       onClick={() => addBullet(exp.id)}
                     >
                       <Plus className="h-3.5 w-3.5" aria-hidden />
@@ -124,7 +128,10 @@ export function ExperienceEditor() {
                         />
                         <button
                           type="button"
-                          onClick={() => removeBullet(exp.id, b.id)}
+                          onClick={() => {
+                            play("remove");
+                            removeBullet(exp.id, b.id);
+                          }}
                           className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                           aria-label="Remove bullet"
                         >
@@ -159,7 +166,7 @@ export function SectionHeader({
           {count === 1 ? "1 item" : `${count} items`}
         </span>
       </div>
-      <Button variant="secondary" size="md" onClick={onAdd}>
+      <Button variant="secondary" size="md" sound="add" onClick={onAdd}>
         <Plus className="h-3.5 w-3.5" aria-hidden />
         {addLabel}
       </Button>

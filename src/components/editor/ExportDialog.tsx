@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/Switch";
 import { Input } from "@/components/ui/Input";
 import { ResumeDocument } from "../pdf/ResumeDocument";
 import { useResumeStore } from "@/lib/store";
+import { useSfx } from "@/lib/useSfx";
 import { Download, Loader2 } from "lucide-react";
 
 type Options = {
@@ -45,6 +46,12 @@ export function ExportDialog({
   const [estimating, setEstimating] = useState(false);
   const [estimatedSize, setEstimatedSize] = useState<number | null>(null);
   const [exporting, setExporting] = useState(false);
+  const play = useSfx();
+
+  useEffect(() => {
+    if (open) play("modalOpen");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   useEffect(() => {
     if (open) {
@@ -99,9 +106,11 @@ export function ExportDialog({
       a.download = `${opts.filename || "Resume"}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
+      play("success");
       onOpenChange(false);
     } catch (err) {
       console.error(err);
+      play("error");
       alert(
         "Couldn't create the PDF. Try toggling the font in Header → Typography to a Google font, then export again.",
       );

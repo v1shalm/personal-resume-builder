@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { StyleEditor } from "./StyleEditor";
 import { autoHref, detectKind, validateContact } from "@/lib/contact-detect";
+import { useSfx } from "@/lib/useSfx";
 
 export function HeaderEditor() {
   const header = useResumeStore((s) => s.resume.header);
@@ -57,6 +58,7 @@ export function HeaderEditor() {
           <Button
             variant="ghost"
             size="sm"
+            sound="add"
             onClick={addContact}
             aria-label="Add contact"
           >
@@ -127,6 +129,7 @@ function ContactRow({
 }) {
   const kind = detectKind(contact.value);
   const validationMsg = validateContact(contact.value);
+  const play = useSfx();
 
   const onValueChange = (next: string) => {
     const patch: Partial<{ value: string; href?: string }> = { value: next };
@@ -189,7 +192,10 @@ function ContactRow({
       </div>
       <button
         type="button"
-        onClick={onRemove}
+        onClick={() => {
+          play("remove");
+          onRemove();
+        }}
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
         aria-label={`Remove ${contact.label || "contact"}`}
       >

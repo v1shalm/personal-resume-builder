@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { spring } from "@/lib/motion";
+import { useSfx } from "@/lib/useSfx";
 
 const WEIGHTS = [
   { value: 400, label: "Regular" },
@@ -18,6 +19,7 @@ type Props = {
 };
 
 export function WeightPicker({ value, onChange, ...rest }: Props) {
+  const play = useSfx();
   return (
     <div
       role="radiogroup"
@@ -35,7 +37,10 @@ export function WeightPicker({ value, onChange, ...rest }: Props) {
             role="radio"
             aria-checked={isActive}
             type="button"
-            onClick={() => onChange(w.value)}
+            onClick={() => {
+              if (!isActive) play("select");
+              onChange(w.value);
+            }}
             className={cn(
               "relative z-10 flex-1 rounded-md px-2 py-[5px] text-[11.5px] transition-colors duration-200",
               isActive ? "text-ink-text" : "text-ink-muted hover:text-ink-text",

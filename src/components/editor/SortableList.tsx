@@ -3,6 +3,7 @@
 import {
   DndContext,
   DragEndEvent,
+  DragStartEvent,
   PointerSensor,
   KeyboardSensor,
   closestCenter,
@@ -20,6 +21,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { motion } from "motion/react";
 import { GripVertical } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSfx } from "@/lib/useSfx";
 
 type SortableListProps<T extends { id: string }> = {
   items: T[];
@@ -36,10 +38,16 @@ export function SortableList<T extends { id: string }>({
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
+  const play = useSfx();
+
+  const onDragStart = (_e: DragStartEvent) => {
+    play("dragStart");
+  };
 
   const onDragEnd = (e: DragEndEvent) => {
     const { active, over } = e;
     if (!over || active.id === over.id) return;
+    play("dragEnd");
     onReorder(String(active.id), String(over.id));
   };
 
@@ -49,6 +57,7 @@ export function SortableList<T extends { id: string }>({
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
       <SortableContext items={items.map((i) => i.id)} strategy={verticalListSortingStrategy}>

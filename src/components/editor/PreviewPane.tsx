@@ -68,14 +68,18 @@ export function PreviewPane() {
 
       <div id="preview-scroll" className="relative z-10 flex-1 overflow-auto">
         <div className="flex min-h-full items-start justify-center p-4 sm:p-8 md:p-12">
-          <motion.div
-            layout
-            transition={spring.soft}
-            className="origin-top shadow-paper-t"
+          {/*
+            Zoom is a paint-only `transform: scale()` — no layout change —
+            so a Framer `layout` animation can't see it and only ends up
+            re-measuring the huge preview subtree on every state change.
+            Plain div is materially cheaper.
+          */}
+          <div
+            className="origin-top shadow-paper-t transition-transform duration-[180ms] ease-out"
             style={{ transform: `scale(${zoom})` }}
           >
             <ResumePreview resume={resume} />
-          </motion.div>
+          </div>
         </div>
       </div>
 

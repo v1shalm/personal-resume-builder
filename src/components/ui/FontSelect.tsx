@@ -5,6 +5,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronDown } from "lucide-react";
 import { fonts, fontById, type FontDef } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
+import { useSfx } from "@/lib/useSfx";
 
 type Props = {
   value: string;
@@ -14,20 +15,38 @@ type Props = {
 
 export function FontSelect({ value, onChange, ...rest }: Props) {
   const current = fontById(value);
+  const play = useSfx();
 
-  // Preload all fonts once dropdown opens so previews render correctly
+  // Preload all fonts once dropdown opens so previews render correctly.
+  // Deferred to an idle frame so the CSS fetches don't race against the
+  // dropdown's open animation on slow connections.
   const [opened, setOpened] = React.useState(false);
   React.useEffect(() => {
     if (!opened) return;
-    for (const f of fonts) {
-      const id = `font-preview-${f.id}`;
-      if (document.getElementById(id)) continue;
-      const link = document.createElement("link");
-      link.id = id;
-      link.rel = "stylesheet";
-      link.href = f.webCssUrl;
-      document.head.appendChild(link);
-    }
+    const run = () => {
+      for (const f of fonts) {
+        const id = `font-preview-${f.id}`;
+        if (document.getElementById(id)) continue;
+        const link = document.createElement("link");
+        link.id = id;
+        link.rel = "stylesheet";
+        link.href = f.webCssUrl;
+        document.head.appendChild(link);
+      }
+    };
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void) => number;
+    };
+    const id = w.requestIdleCallback
+      ? w.requestIdleCallback(run)
+      : window.setTimeout(run, 0);
+    return () => {
+      const cancel = (window as Window & {
+        cancelIdleCallback?: (id: number) => void;
+      }).cancelIdleCallback;
+      if (cancel) cancel(id);
+      else window.clearTimeout(id);
+    };
   }, [opened]);
 
   const grouped = React.useMemo(() => {
@@ -39,7 +58,12 @@ export function FontSelect({ value, onChange, ...rest }: Props) {
   }, []);
 
   return (
-    <DropdownMenu.Root onOpenChange={setOpened}>
+    <DropdownMenu.Root
+      onOpenChange={(o) => {
+        play(o ? "dropdownOpen" : "dropdownClose");
+        setOpened(o);
+      }}
+    >
       <DropdownMenu.Trigger
         aria-label={rest["aria-label"]}
         className={cn(
@@ -81,7 +105,10 @@ export function FontSelect({ value, onChange, ...rest }: Props) {
                 return (
                   <DropdownMenu.Item
                     key={f.id}
-                    onSelect={() => onChange(f.id)}
+                    onSelect={() => {
+                      if (!isActive) play("select");
+                      onChange(f.id);
+                    }}
                     className={cn(
                       "flex cursor-pointer items-center justify-between gap-3 rounded-md px-2.5 py-2 text-[13px] text-ink-text",
                       "focus:bg-ink-surfaceHi focus:outline-none data-[highlighted]:bg-ink-surfaceHi",

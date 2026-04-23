@@ -6,6 +6,8 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { motion, type HTMLMotionProps } from "motion/react";
 import { cn } from "@/lib/utils";
 import { spring } from "@/lib/motion";
+import { useSfx } from "@/lib/useSfx";
+import type { SoundName } from "@/lib/sfx";
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg font-medium transition-[background,border,color,box-shadow] duration-150 disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-offset-2",
@@ -47,15 +49,30 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
   children?: React.ReactNode;
+  /**
+   * Sound played on press. Pass `false` to suppress. Defaults to `"click"`
+   * for primary buttons and `"tap"` for everything else.
+   */
+  sound?: SoundName | false;
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild, ...props }, ref) => {
+  ({ className, variant, size, asChild, onClick, sound, ...props }, ref) => {
+    const play = useSfx();
+    const resolvedSound: SoundName | false =
+      sound === undefined ? (variant === "primary" ? "click" : "tap") : sound;
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (resolvedSound) play(resolvedSound);
+      onClick?.(e);
+    };
+
     if (asChild) {
       return (
         <Slot
           ref={ref as unknown as React.Ref<HTMLElement>}
           className={cn(buttonVariants({ variant, size, className }))}
+          onClick={handleClick as unknown as React.MouseEventHandler<HTMLElement>}
           {...(props as unknown as React.HTMLAttributes<HTMLElement>)}
         />
       );
@@ -66,6 +83,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         whileTap={{ scale: 0.97, y: 0.5 }}
         transition={spring.press}
         className={cn(buttonVariants({ variant, size, className }))}
+        onClick={handleClick}
         {...props}
       />
     );

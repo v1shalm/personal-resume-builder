@@ -5,6 +5,7 @@ import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { spring } from "@/lib/motion";
 import { THEMES } from "@/lib/themes";
+import { useSfx } from "@/lib/useSfx";
 
 type Props = {
   value: string; // theme id
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export function ThemePicker({ value, onChange, ...rest }: Props) {
+  const play = useSfx();
   return (
     <div
       role="radiogroup"
@@ -31,7 +33,10 @@ export function ThemePicker({ value, onChange, ...rest }: Props) {
             whileHover={{ y: -1, scale: 1.03 }}
             whileTap={{ scale: 0.94, y: 0.5 }}
             transition={spring.press}
-            onClick={() => onChange(t.id, t.accent, t.sub)}
+            onClick={() => {
+              if (!isActive) play("select");
+              onChange(t.id, t.accent, t.sub);
+            }}
             className={cn(
               "group flex flex-col items-stretch gap-0 overflow-hidden rounded-[10px]",
               "transition-[box-shadow] duration-150",

@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { X, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { spring, rowFadeUp } from "@/lib/motion";
+import { useSfx } from "@/lib/useSfx";
 
 type Props = {
   // Comma-separated value — so we don't have to migrate storage shape.
@@ -35,6 +36,7 @@ export function TokenInput({
   const [focused, setFocused] = React.useState(false);
   const [highlighted, setHighlighted] = React.useState(0);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const play = useSfx();
 
   const existing = React.useMemo(
     () => new Set(tokens.map((t) => t.toLowerCase())),
@@ -69,6 +71,7 @@ export function TokenInput({
       setDraft("");
       return;
     }
+    play("add");
     onChange(serialize([...tokens, next]));
     setDraft("");
     setHighlighted(0);
@@ -77,6 +80,7 @@ export function TokenInput({
   const remove = (index: number) => {
     const next = tokens.slice();
     next.splice(index, 1);
+    play("remove");
     onChange(serialize(next));
   };
 
@@ -94,10 +98,18 @@ export function TokenInput({
       remove(tokens.length - 1);
     } else if (e.key === "ArrowDown" && filtered.length > 0) {
       e.preventDefault();
-      setHighlighted((h) => Math.min(h + 1, filtered.length - 1));
+      setHighlighted((h) => {
+        const nh = Math.min(h + 1, filtered.length - 1);
+        if (nh !== h) play("tick");
+        return nh;
+      });
     } else if (e.key === "ArrowUp" && filtered.length > 0) {
       e.preventDefault();
-      setHighlighted((h) => Math.max(h - 1, 0));
+      setHighlighted((h) => {
+        const nh = Math.max(h - 1, 0);
+        if (nh !== h) play("tick");
+        return nh;
+      });
     } else if (e.key === "Escape") {
       setDraft("");
     }
