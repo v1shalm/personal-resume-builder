@@ -24,6 +24,15 @@ type Options = {
   subsetFonts: boolean;
 };
 
+// Compact month label ("Apr2026") — a recruiter opening
+// "Alex_Chen_Resume_Apr2026.pdf" instantly knows whose it is and when
+// it was written. Compare to "Resume.pdf" — a landfill.
+function currentMonthYear() {
+  const now = new Date();
+  const month = now.toLocaleString("en-US", { month: "short" });
+  return `${month}${now.getFullYear()}`;
+}
+
 export function ExportDialog({
   open,
   onOpenChange,
@@ -33,8 +42,8 @@ export function ExportDialog({
 }) {
   const resume = useResumeStore((s) => s.resume);
   const defaultFilename = resume.header.name
-    ? `${resume.header.name.replace(/\s+/g, "_")}_Resume`
-    : "Resume";
+    ? `${resume.header.name.replace(/\s+/g, "_")}_Resume_${currentMonthYear()}`
+    : `Resume_${currentMonthYear()}`;
 
   const [opts, setOpts] = useState<Options>({
     filename: defaultFilename,

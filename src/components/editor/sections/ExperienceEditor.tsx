@@ -3,8 +3,8 @@
 import { useResumeStore, temporalStore } from "@/lib/store";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { AutoTextarea } from "@/components/ui/AutoTextarea";
 import { SortableList, DragHandle } from "../SortableList";
+import { BulletField } from "../BulletField";
 import { Field } from "./HeaderEditor";
 import { Plus, Trash2 } from "lucide-react";
 import { useSfx } from "@/lib/useSfx";
@@ -120,13 +120,9 @@ export function ExperienceEditor() {
                         <div className="pt-2">
                           <DragHandle dragAttrs={dragAttrs} dragListeners={dragListeners} />
                         </div>
-                        <AutoTextarea
-                          aria-label="Bullet point"
-                          minRows={2}
-                          className="min-h-[52px] border-transparent bg-transparent shadow-none hover:border-ink-border focus:shadow-none"
+                        <BulletField
                           value={b.text}
-                          onChange={(e) => updateBullet(exp.id, b.id, e.target.value)}
-                          placeholder="What you did, and the impact it had."
+                          onChange={(text) => updateBullet(exp.id, b.id, text)}
                         />
                         <button
                           type="button"

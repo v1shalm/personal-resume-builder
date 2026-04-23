@@ -17,6 +17,7 @@ import {
 import { StyleEditor } from "./StyleEditor";
 import { autoHref, detectKind, validateContact } from "@/lib/contact-detect";
 import { useSfx } from "@/lib/useSfx";
+import { CharCount } from "@/components/ui/CharCount";
 
 export function HeaderEditor() {
   const header = useResumeStore((s) => s.resume.header);
@@ -37,20 +38,30 @@ export function HeaderEditor() {
       </Field>
 
       <Field label="Title">
-        <Input
-          value={header.title}
-          onChange={(e) => updateHeader({ title: e.target.value })}
-          placeholder="Product Designer"
-        />
+        <div className="flex flex-col gap-1">
+          <Input
+            value={header.title}
+            onChange={(e) => updateHeader({ title: e.target.value })}
+            placeholder="Product Designer"
+          />
+          <div className="flex justify-end">
+            <CharCount value={header.title} softMax={60} />
+          </div>
+        </div>
       </Field>
 
       <Field label="Summary" hint="One or two sentences about you.">
-        <Textarea
-          rows={3}
-          value={header.tagline}
-          onChange={(e) => updateHeader({ tagline: e.target.value })}
-          placeholder="What you do and what you bring to a team."
-        />
+        <div className="flex flex-col gap-1">
+          <Textarea
+            rows={3}
+            value={header.tagline}
+            onChange={(e) => updateHeader({ tagline: e.target.value })}
+            placeholder="What you do and what you bring to a team."
+          />
+          <div className="flex justify-end">
+            <CharCount value={header.tagline} softMax={240} />
+          </div>
+        </div>
       </Field>
 
       <section className="flex flex-col gap-3">
