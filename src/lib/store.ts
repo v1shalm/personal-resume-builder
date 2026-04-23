@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { temporal } from "zundo";
 import type {
   Contact,
   EducationItem,
@@ -17,6 +18,26 @@ import type {
   Style,
 } from "./types";
 import { seedResume } from "./seed";
+
+// Collapse rapid consecutive `set()` calls (e.g. each keystroke while
+// typing) into a single history entry. Without this, `⌘Z` would undo
+// one character at a time — annoying. 500ms is the "I paused" window.
+function throttle<A extends unknown[]>(
+  fn: (...args: A) => void,
+  wait: number,
+): (...args: A) => void {
+  let latestArgs: A | null = null;
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  const flush = () => {
+    if (latestArgs) fn(...latestArgs);
+    latestArgs = null;
+    timer = null;
+  };
+  return (...args: A) => {
+    latestArgs = args;
+    if (timer == null) timer = setTimeout(flush, wait);
+  };
+}
 
 const uid = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -97,7 +118,8 @@ const moveInArray = <T extends { id: string }>(
 
 export const useResumeStore = create<Store>()(
   persist(
-    (set) => ({
+    temporal(
+      (set) => ({
       resume: seedResume,
       selection: { kind: "header" },
 
@@ -432,9 +454,27 @@ export const useResumeStore = create<Store>()(
       importResume: (resume) =>
         set({ resume, selection: { kind: "header" } }),
     }),
+      {
+        // Only track `resume` for undo history. Selection changes
+        // (clicking a tab, picking a row) are not undoable.
+        partialize: (state) => ({ resume: state.resume }),
+        // Cap memory. 100 steps ≈ plenty for a session without
+        // blowing up localStorage or RAM.
+        limit: 100,
+        // Throttle rapid sets (like typing) so "h-e-l-l-o" becomes
+        // ONE history entry, not five.
+        handleSet: (handleSet) => throttle(handleSet, 500),
+        // Skip recording when nothing changed (e.g. clicking the
+        // same field) — compare by top-level identity.
+        equality: (a, b) => a.resume === b.resume,
+      },
+    ),
     {
       name: "resume-builder:v5",
       version: 5,
+      // Only persist `resume` — undo history is intentionally
+      // session-scoped. Reload = clean slate, keeping localStorage
+      // predictable.
       partialize: (s) => ({ resume: s.resume }),
       migrate: (persistedState: unknown, version: number) => {
         if (version < 5) return { resume: seedResume };
@@ -443,3 +483,16 @@ export const useResumeStore = create<Store>()(
     },
   ),
 );
+
+// Imperative undo helper usable from anywhere (toast action handlers,
+// delete buttons, etc.). zundo attaches `temporal` to the store via a
+// type extension; we cast to reveal it.
+type TemporalApi = {
+  undo: () => void;
+  redo: () => void;
+  pastStates: unknown[];
+  futureStates: unknown[];
+};
+export const temporalStore = () =>
+  (useResumeStore as unknown as { temporal: { getState: () => TemporalApi } })
+    .temporal.getState();

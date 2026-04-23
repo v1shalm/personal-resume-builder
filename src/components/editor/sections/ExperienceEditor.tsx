@@ -1,6 +1,6 @@
 "use client";
 
-import { useResumeStore } from "@/lib/store";
+import { useResumeStore, temporalStore } from "@/lib/store";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { AutoTextarea } from "@/components/ui/AutoTextarea";
@@ -8,6 +8,7 @@ import { SortableList, DragHandle } from "../SortableList";
 import { Field } from "./HeaderEditor";
 import { Plus, Trash2 } from "lucide-react";
 import { useSfx } from "@/lib/useSfx";
+import { showToast } from "@/lib/toast";
 
 export function ExperienceEditor() {
   const items = useResumeStore((s) => s.resume.experience);
@@ -52,15 +53,16 @@ export function ExperienceEditor() {
                 <button
                   type="button"
                   onClick={() => {
-                    const label = exp.company || exp.role || "this role";
-                    if (
-                      confirm(
-                        `Delete ${label}?\n\nAll of its bullets will be removed too. Can't be undone.`,
-                      )
-                    ) {
-                      play("remove");
-                      removeExperience(exp.id);
-                    }
+                    const label = exp.company || exp.role || "Role";
+                    play("remove");
+                    removeExperience(exp.id);
+                    showToast({
+                      message: `${label} removed`,
+                      action: {
+                        label: "Undo",
+                        onClick: () => temporalStore().undo(),
+                      },
+                    });
                   }}
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-fast hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                   aria-label={`Remove ${exp.company || "role"}`}
@@ -131,6 +133,13 @@ export function ExperienceEditor() {
                           onClick={() => {
                             play("remove");
                             removeBullet(exp.id, b.id);
+                            showToast({
+                              message: "Bullet removed",
+                              action: {
+                                label: "Undo",
+                                onClick: () => temporalStore().undo(),
+                              },
+                            });
                           }}
                           className="mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-fast hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                           aria-label="Remove bullet"

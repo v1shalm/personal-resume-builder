@@ -1,6 +1,7 @@
 "use client";
 
-import { useResumeStore } from "@/lib/store";
+import { useResumeStore, temporalStore } from "@/lib/store";
+import { showToast } from "@/lib/toast";
 import { Input } from "@/components/ui/Input";
 import { SortableList, DragHandle } from "../SortableList";
 import { Field } from "./HeaderEditor";
@@ -42,14 +43,16 @@ export function EducationEditor() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (
-                      confirm(
-                        `Delete ${ed.degree || "this entry"}?\n\nCan't be undone.`,
-                      )
-                    ) {
-                      play("remove");
-                      remove(ed.id);
-                    }
+                    const label = ed.degree || "Education entry";
+                    play("remove");
+                    remove(ed.id);
+                    showToast({
+                      message: `${label} removed`,
+                      action: {
+                        label: "Undo",
+                        onClick: () => temporalStore().undo(),
+                      },
+                    });
                   }}
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-fast hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                   aria-label={`Remove ${ed.degree || "entry"}`}

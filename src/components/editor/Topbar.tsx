@@ -9,6 +9,7 @@ import { useTheme } from "@/lib/theme";
 import { useSoundSettings } from "@/lib/soundSettings";
 import { useSfx } from "@/lib/useSfx";
 import { useThemeSwap } from "@/lib/useThemeSwap";
+import { SavedChip } from "./SavedChip";
 
 // `@react-pdf/renderer` is ~300 KB+ of PDF engine. Code-split the whole
 // ExportDialog (which transitively pulls it in) so visitors who never
@@ -136,6 +137,7 @@ export function Topbar() {
               {name || "—"}
             </span>
           </div>
+          <SavedChip />
         </motion.div>
         <motion.div variants={rowFadeUp} className="flex shrink-0 items-center gap-1 sm:gap-1.5">
           {/* Import — icon-only on narrow, icon+label from md */}

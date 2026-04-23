@@ -1,6 +1,7 @@
 "use client";
 
-import { useResumeStore } from "@/lib/store";
+import { useResumeStore, temporalStore } from "@/lib/store";
+import { showToast } from "@/lib/toast";
 import { Input } from "@/components/ui/Input";
 import { TokenInput } from "@/components/ui/TokenInput";
 import { SortableList, DragHandle } from "../SortableList";
@@ -43,14 +44,16 @@ export function SkillsEditor() {
                 <button
                   type="button"
                   onClick={() => {
-                    if (
-                      confirm(
-                        `Delete the ${g.label || "skill"} group?\n\nAll of its items will be removed. Can't be undone.`,
-                      )
-                    ) {
-                      play("remove");
-                      remove(g.id);
-                    }
+                    const label = g.label || "Skill group";
+                    play("remove");
+                    remove(g.id);
+                    showToast({
+                      message: `${label} removed`,
+                      action: {
+                        label: "Undo",
+                        onClick: () => temporalStore().undo(),
+                      },
+                    });
                   }}
                   className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-fast hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                   aria-label={`Remove ${g.label || "group"}`}

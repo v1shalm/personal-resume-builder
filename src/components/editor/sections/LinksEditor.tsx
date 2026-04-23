@@ -1,6 +1,7 @@
 "use client";
 
-import { useResumeStore } from "@/lib/store";
+import { useResumeStore, temporalStore } from "@/lib/store";
+import { showToast } from "@/lib/toast";
 import { Input } from "@/components/ui/Input";
 import { SortableList, DragHandle } from "../SortableList";
 import { SectionHeader, EmptyState } from "./ExperienceEditor";
@@ -47,8 +48,16 @@ export function LinksEditor() {
               <button
                 type="button"
                 onClick={() => {
+                  const label = l.label || "Link";
                   play("remove");
                   remove(l.id);
+                  showToast({
+                    message: `${label} removed`,
+                    action: {
+                      label: "Undo",
+                      onClick: () => temporalStore().undo(),
+                    },
+                  });
                 }}
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-fast hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
                 aria-label={`Remove ${l.label || "link"}`}

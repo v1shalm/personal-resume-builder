@@ -1,7 +1,8 @@
 "use client";
 
-import { useResumeStore } from "@/lib/store";
+import { useResumeStore, temporalStore } from "@/lib/store";
 import { Input, Textarea, Label } from "@/components/ui/Input";
+import { showToast } from "@/lib/toast";
 import { Button } from "@/components/ui/Button";
 import { SortableList, DragHandle } from "../SortableList";
 import {
@@ -193,8 +194,16 @@ function ContactRow({
       <button
         type="button"
         onClick={() => {
+          const label = contact.label || "Contact";
           play("remove");
           onRemove();
+          showToast({
+            message: `${label} removed`,
+            action: {
+              label: "Undo",
+              onClick: () => temporalStore().undo(),
+            },
+          });
         }}
         className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-ink-muted transition-colors duration-fast hover:bg-ink-hoverDanger hover:text-ink-danger sm:h-8 sm:w-8"
         aria-label={`Remove ${contact.label || "contact"}`}

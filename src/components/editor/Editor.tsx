@@ -5,9 +5,12 @@ import { Topbar } from "./Topbar";
 import { PreviewPane } from "./PreviewPane";
 import { EditorPanel } from "./EditorPanel";
 import { SoundRoot } from "@/components/providers/SoundRoot";
+import { Toaster } from "@/components/ui/Toaster";
+import { useUndoShortcuts } from "@/lib/useUndoShortcuts";
 
 export function Editor() {
   const [mounted, setMounted] = useState(false);
+  useUndoShortcuts();
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -38,6 +41,7 @@ export function Editor() {
           <PreviewPane />
           <EditorPanel />
         </div>
+        <Toaster />
       </div>
     </SoundRoot>
   );
