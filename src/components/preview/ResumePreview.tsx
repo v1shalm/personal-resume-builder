@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { forwardRef, memo } from "react";
 import type { Resume, SectionKind } from "@/lib/types";
 import { fontById } from "@/lib/fonts";
 
@@ -40,7 +40,10 @@ const COLOR = {
   linkUrl: "oklch(0.48 0.15 260)",
 } as const;
 
-function ResumePreviewInner({ resume }: Props) {
+const ResumePreviewInner = forwardRef<HTMLDivElement, Props>(function ResumePreviewInner(
+  { resume },
+  ref,
+) {
   const { header, sectionOrder, sections, style } = resume;
   const titleFamily = `'${fontById(style.titleFontId).family}', var(--font-sans)`;
   const bodyFamily = `'${fontById(style.bodyFontId).family}', var(--font-sans)`;
@@ -63,6 +66,7 @@ function ResumePreviewInner({ resume }: Props) {
 
   return (
     <div
+      ref={ref}
       className="paper"
       style={{
         width: PAGE_WIDTH,
@@ -200,12 +204,14 @@ function ResumePreviewInner({ resume }: Props) {
       </div>
     </div>
   );
-}
+});
 
 // Memoised on `resume` reference. Since zustand produces a new resume
 // object only when the resume actually changes, this skips re-renders
 // caused by unrelated PreviewPane state (zoom, fitMode, toolbar anims).
 export const ResumePreview = memo(ResumePreviewInner);
+export const PREVIEW_PAGE_HEIGHT = PAGE_HEIGHT;
+export const PREVIEW_PAGE_WIDTH = PAGE_WIDTH;
 
 type BodyCtx = {
   bodyFamily: string;
